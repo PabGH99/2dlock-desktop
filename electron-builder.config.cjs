@@ -41,7 +41,8 @@ module.exports = {
   win: {
     icon: 'build/icon.ico',
     target: ['nsis'],
-    signAndEditExecutable: false
+    // Keep resource editing enabled so the icon and metadata are embedded; skip code signing only.
+    signExecutable: false
   },
   nsis: {
     oneClick: false,
