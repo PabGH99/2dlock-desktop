@@ -93,6 +93,8 @@ jobs:
         shell: pwsh
         run: |
           if (Test-Path dist) { Remove-Item dist -Recurse -Force }
+          node scripts/create-icon-ico.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           npx electron-builder --config electron-builder.config.cjs --win nsis --publish never
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         env:
