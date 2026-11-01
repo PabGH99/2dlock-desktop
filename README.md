@@ -8,7 +8,7 @@
 
 Il progetto è realizzato in **HTML5, Canvas, CSS e JavaScript** e può essere giocato direttamente nel browser oppure tramite l'app desktop Windows basata su Electron.
 
-> **Versione del gioco:** V7.7.23 TEST · **Desktop/updater:** 3.0.7  
+> **Versione del gioco:** V7.7.23 TEST · **Desktop/updater:** 3.0.8  
 > [⬇️ Scarica l'ultima versione per Windows](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases/latest) · [📦 Tutte le release](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases)
 
 ---
@@ -92,7 +92,7 @@ In alternativa, su Windows puoi usare `AVVIA_DEV.bat` per avviare in sviluppo o 
 Il repository usa **GitHub Actions** per compilare e pubblicare l'installer Windows e i file necessari all'auto-updater.
 
 1. Aggiorna `index.html`, inclusi titolo, metadati, contratto di manutenzione e changelog del gioco.
-2. Incrementa la versione desktop in **entrambi** `package.json` e `package-lock.json` (per esempio `3.0.6` → `3.0.7`).
+2. Incrementa la versione desktop in **entrambi** `package.json` e `package-lock.json` (per esempio `3.0.6` → `3.0.8`).
 3. Fai commit e push su `main` quando sei pronto a pubblicare.
 4. Il workflow esegue i controlli, crea la release `vX.Y.Z`, compila l'installer e carica `.exe`, `.blockmap` e `latest.yml`.
 
@@ -112,7 +112,7 @@ I salvataggi dell'app desktop sono conservati in `%APPDATA%\\2Dlock`, al di fuor
 
 - **Gioco:** 2Dlock — calcio 2D con stili, Flow e abilità.
 - **Build corrente:** V7.7.23 TEST.
-- **App desktop:** Electron per Windows (3.0.7).
+- **App desktop:** Electron per Windows (3.0.8).
 - **Gameplay:** locale contro bot; gli aggiornamenti automatici richiedono Internet.
 - **Release:** [GitHub Releases](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases).
 

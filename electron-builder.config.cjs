@@ -39,7 +39,7 @@ module.exports = {
   compression: 'maximum',
   npmRebuild: false,
   win: {
-    icon: 'build/icon.ico',
+    icon: 'build/icon.png',
     target: ['nsis'],
     // Keep resource editing enabled so the icon and metadata are embedded; skip code signing only.
     signExecutable: false
