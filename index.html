@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<!-- V7.7.19 TEST: Normal Egoist quests now refresh every 24 hours with a localized daily-reset notice; quest pool, rewards and progress rules stay unchanged. V7.7.18 Halloween weekly Battle Pass missions remain intact. -->
+<!-- V7.7.23 TEST: Spreads Premium rewards across 21 separate tiers; protects all current and legacy seasonal Pass cosmetics from inventory sales; adds a claim-complete cycle reset button and a one-time fresh Pass reset. Preserves Yen, owned inventory, weekly missions, daily quests, LAN, Skip Pass and gameplay. V7.7.22 TEST: Starts EGOIST AUTUMN FEST with a one-time fresh Battle Pass reset (level/EXP/track claims/seasonal quests); preserves Yen, owned inventory, normal daily quests and weekly mission progress. V7.7.21 TEST: Restyles the seasonal Battle Pass as EGOIST AUTUMN FEST, adds six Autumn gradients, six Autumn ball skins, four new goal explosions and an overlay-only falling-leaves canvas; preserves LAN, Skip Pass, daily/weekly quests and gameplay. V7.7.20 TEST: Adds browser-preview LAN host/join/lobby screens and fixes Skip Pass ownership so the Settings toggle cannot grant it for free. Actual LAN sockets remain desktop-bridge-only. V7.7.19 TEST: Normal Egoist quests now refresh every 24 hours with a localized daily-reset notice; quest pool, rewards and progress rules stay unchanged. V7.7.18 Halloween weekly Battle Pass missions remain intact. -->
 <!-- V7.7.15 TEST: Shark Orbital Synergy is now teammate-assist-only. It can start only while a teammate owns the ball; the teammate is the cinematic finisher, no forced/instant goal is awarded, and a goal by that teammate credits the player with an assist. -->
 <!-- V7.7.11 TEST: Chameleon 99% Copy is fully locked while its cooldown is active: X cannot start targeting or execute a stored copy, and mouse/key selection cannot bypass the cooldown. When cooldown is active, any stray targeting/ability-choice state is cleared. V7.7.10 Zigzag Copy fixes and the ×1.099 Secret Flow 99% nerf remain intact. -->
 <!--
 AI MAINTENANCE CONTRACT — READ BEFORE EDITING THIS GAME
+- V7.7.23 TEST — AUTUMN PASS REWORK: Distribute Premium rewards so each populated tier contains at most one reward; protect current and legacy Pass cosmetics from inventory sales; add a cycle-reset action unlocked only after Level 30 and all eligible rewards are claimed. Run a one-time fresh seasonal reset for this version. Preserve Premium ownership on manual cycle reset, Yen, inventory, weekly quests, daily quests, LAN, Skip Pass, gameplay and the fixed 60 Hz loop.
+- V7.7.22 TEST — AUTUMN PASS FRESH START: On first launch only, clear the seasonal Battle Pass progression key and seasonal quest key so the Autumn pass starts at level 1 with 0 EXP, unclaimed tracks and fresh seasonal quests. Preserve Yen, all already-owned inventory rewards, normal daily quests, weekly Battle Pass quest progress/claims, LAN, Skip Pass and every unrelated save. Keep the established Battle Pass storage keys and the fixed 60 Hz loop.
+- V7.7.21 TEST — EGOIST AUTUMN FEST: Restyle only the seasonal Battle Pass, preserve all localStorage keys/gameState/functions and old reward IDs, add Autumn reward variants and a leaf canvas that runs only while the overlay is open. Keep LAN preview, Skip Pass ownership, daily/weekly quests, gameplay, fixed 60 Hz loop, physics and character VFX unchanged.
+- V7.7.20 TEST — LAN BROWSER PREVIEW + SKIP PASS OWNERSHIP FIX: Add LAN menu/host/join/lobby preview screens and optional window.lanBridge hooks; browser mode must clearly state that no socket/network connection is opened. Separate Skip Pass ownership from activation using hasSkipPassPurchased; only Shop purchase grants ownership, Settings only toggles an owned pass. Preserve the fixed 60 Hz loop, gameplay mechanics, match physics, VFX, Gacha, Ranked, quests, Battle Pass and existing save compatibility.
 - V7.7.19 TEST — DAILY NORMAL QUESTS: The existing normal Egoist quests refresh every 24 hours, based on the existing generation timestamp, with a visible day-length countdown and localized reset notice. Keep QUEST_MASTER_POOL content, quest rewards, progression, and existing storage keys unchanged; only the refresh interval/notice is updated. Do not alter the fixed 60 Hz loop, STEP_MS, gameplay mechanics, Gacha, Ranked, seasonal/weekly Halloween quests or character VFX.
 - V7.7.18 TEST — HALLOWEEN WEEKLY PASS: Add five independent weekly Battle Pass quests, a Monday reset using getRankedWeekKey(), a visible countdown, Italian/English/French/Spanish labels, and separate persistence in egoist_halloween_weekly_pass. Weekly EXP/Yen claims must stay separate from seasonal quest flags. Do not modify the fixed 60 Hz loop, gameplay mechanics, Gacha, Ranked, normal quests or character VFX.
 - V7.7.17 TEST — PANTHER NEON CHEETAH VFX (DO NOT REGRESS): Add a detailed animated pink panther companion whose gallop speed changes with acceleration tiers; add direction-aware acceleration afterimages/speed lines, violet-to-cyan electricity, Panther-only gold Flow 44 aura, gold AWK crown/flash, rotating six-glyph Zona 44 rune and shockwave/field flash. Keep all visuals gated to Panther, Flow 44 on Panther, or Panther AWK/acceleration; do not change cooldowns, speed multipliers, stun rules, Zona 44 radius/activation, ball/goal physics, hitboxes, or any other style. Keep the fixed 60 Hz loop.
@@ -57,13 +61,13 @@ AI MAINTENANCE CONTRACT — READ BEFORE EDITING THIS GAME
 <!-- V4.6 TEST: adds Pyro Striker, Tidal Playmaker, and Terra Sentinel Common styles with C/X skills and AWK ultimates. -->
 <head>
 <!-- V4.7 TEST: adds three matching Common Flows, complete C/X/V HUD entries, Ocean Network wave-pass VFX, Terra Tectonic Shift, and i-frame-safe steal skills. -->
-    <meta name="application-name" content="2Dlock V7.7.19 TEST — Daily Normal Quests">
+    <meta name="application-name" content="2Dlock V7.7.23 TEST — Autumn Pass Rework">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Teko:wght@500;700&family=Rajdhani:wght@600;700;800&display=swap">
-    <title>2Dlock V7.7.19 TEST — Daily Normal Quests</title>
+    <title>2Dlock V7.7.23 TEST — Autumn Pass Rework</title>
     <style>/* =========================================================
    V6.8 TEST — KAISER VFX RESTORATION (HUD/RARITY/QOL PRESERVED)
    Interface chrome only. Match VFX, physics and gameplay untouched.
@@ -81,99 +85,291 @@ AI MAINTENANCE CONTRACT — READ BEFORE EDITING THIS GAME
 @keyframes na-fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes na-modal-in{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes v49-ui-pop{0%{transform:scale(.94)}55%{transform:scale(1.03)}100%{transform:scale(1)}}.v49-pop{animation:v49-ui-pop .26s cubic-bezier(.18,.9,.24,1.25) both!important}.login-btn,.admin-modal-btn,.hud-btn,.code-modal-actions button{transition:transform .12s cubic-bezier(.2,.8,.2,1),filter .12s,box-shadow .12s,background .12s,border-color .12s}.login-btn:hover,.admin-modal-btn:hover,.hud-btn:hover,.code-modal-actions button:hover{filter:brightness(1.1)}
 @media(max-width:800px){#topBar{padding:8px 10px!important}#ui{font-size:10px!important;gap:4px!important}#ui>span{min-height:22px!important;padding:2px 6px!important}.hud-btn{font-size:9px!important;padding:6px 9px!important;min-height:30px!important}#botEditorDock{top:124px;right:8px;width:210px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-/* === HALLOWEEN BATTLE PASS === */
-#halloweenPassBtn{border-color:#FF7A00;color:#FFE6C7;background:linear-gradient(180deg,rgba(65,31,9,.96),rgba(17,10,24,.98));box-shadow:inset 0 0 14px rgba(255,122,0,.07)}
-#halloweenPassBtn:before{background:#FF7A00;opacity:.55}
-#halloweenPassBtn:hover{border-color:#FFB15C;color:#fff;box-shadow:0 0 18px rgba(255,122,0,.32),inset 0 0 16px rgba(255,122,0,.12)}
-.hp-backdrop{display:none;position:fixed;inset:0;z-index:2147483100;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px);background:radial-gradient(ellipse at 50% 5%,#1a0b2e 0%,#05030b 60%,#020108 100%);overflow:hidden;isolation:isolate}
+/* === EGOIST AUTUMN FEST BATTLE PASS === */
+:root{
+  --aut-wood-dark:#2B1A0E; --aut-wood-mid:#4A2B15; --aut-wood-light:#6B4226;
+  --aut-wood-warm:#8B5A2B; --aut-wood-highlight:#A9703A;
+  --aut-orange:#E8631A; --aut-orange-soft:#F28C28; --aut-orange-deep:#B33C00;
+  --aut-yellow:#F2B705; --aut-yellow-warm:#FFCC33; --aut-gold:#D99B1B;
+  --aut-red:#B31E22; --aut-red-bright:#E23B28; --aut-crimson:#8A0F13;
+  --aut-olive:#6B7A1F; --aut-olive-soft:#8FA028;
+  --aut-cream:#F7E9C9; --aut-parchment:#E8D3AE;
+  --aut-shadow:rgba(20,10,4,.85);
+}
+
+#halloweenPassBtn{
+  border-color:var(--aut-orange); color:var(--aut-cream);
+  background:linear-gradient(180deg,rgba(60,30,15,.96),rgba(20,10,5,.98));
+  box-shadow:inset 0 0 14px rgba(232,99,26,.10);
+}
+#halloweenPassBtn:before{background:var(--aut-orange);opacity:.7}
+#halloweenPassBtn:hover{border-color:var(--aut-yellow);color:#fff;
+  box-shadow:0 0 18px rgba(232,99,26,.35),inset 0 0 16px rgba(242,183,5,.14)}
+
+.hp-backdrop{display:none;position:fixed;inset:0;z-index:2147483100;
+  align-items:center;justify-content:center;padding:clamp(8px,2vw,24px);
+  background:radial-gradient(ellipse at 50% 0%,#3a1e08 0%,#1a0c04 55%,#080402 100%);
+  overflow:hidden;isolation:isolate}
 .hp-backdrop.open{display:flex;animation:hp-backdrop-in .22s ease both}
-.hp-backdrop:before{content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(180,122,255,.055) 0 1px,transparent 1px 48px),linear-gradient(180deg,rgba(255,122,0,.02),transparent 58%,rgba(0,255,157,.035));mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
-.hp-backdrop:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 20% 35%,rgba(180,122,255,.12),transparent 33%),radial-gradient(ellipse at 80% 72%,rgba(0,255,157,.06),transparent 30%),radial-gradient(ellipse at 48% 100%,rgba(255,122,0,.07),transparent 32%)}
-.hp-shell{width:min(1560px,100%);height:min(940px,96vh);min-height:0;position:relative;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(165deg,rgba(20,9,36,.98),rgba(6,4,12,.985) 56%,rgba(11,20,21,.98));border:1px solid rgba(180,122,255,.58);border-top:2px solid #FF7A00;border-bottom:2px solid rgba(0,255,157,.45);clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));box-shadow:0 26px 90px rgba(0,0,0,.72),0 0 46px rgba(180,122,255,.12),inset 0 1px rgba(255,255,255,.055);animation:hp-panel-in .32s cubic-bezier(.2,.85,.25,1) both}
-.hp-shell:before{content:"";pointer-events:none;position:absolute;left:0;top:0;width:40%;height:2px;background:linear-gradient(90deg,#FF7A00,#B47AFF,transparent);z-index:2}
-.hp-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:clamp(14px,2vw,24px) clamp(14px,2.2vw,30px) 14px;border-bottom:1px solid rgba(180,122,255,.22);background:linear-gradient(90deg,rgba(255,122,0,.06),transparent 45%,rgba(0,255,157,.035));flex-shrink:0}
-.hp-kicker{font:800 9px Orbitron, sans-serif;letter-spacing:3px;color:#B47AFF;text-transform:uppercase;margin-bottom:5px}
-.hp-title{font:900 clamp(22px,3vw,38px)/1.02 Orbitron,sans-serif;letter-spacing:1.3px;color:#fff;margin:0;text-shadow:0 0 24px rgba(180,122,255,.23)}
-.hp-title span{color:#FF7A00}
-.hp-subtitle{font:700 13px Rajdhani,sans-serif;letter-spacing:1.1px;color:#B9AEC9;margin-top:7px}
-.hp-close{min-width:44px;min-height:42px;font:900 12px Orbitron,sans-serif;color:#F5EFFF;background:rgba(23,12,35,.96);border:1px solid rgba(180,122,255,.48);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));cursor:pointer;touch-action:manipulation;transition:transform .14s,box-shadow .14s,border-color .14s}
-.hp-close:hover{border-color:#FF7A00;box-shadow:0 0 18px rgba(255,122,0,.22);transform:translateY(-1px)}
-.hp-content{overflow:auto;overscroll-behavior:contain;padding:16px clamp(12px,2vw,28px) 24px;scrollbar-color:#7545A1 #10091B;scrollbar-width:thin}
-.hp-summary{display:grid;grid-template-columns:minmax(210px,.9fr) minmax(250px,1.45fr) minmax(230px,1fr);gap:12px;align-items:stretch;margin-bottom:18px}
-.hp-stat,.hp-progress-card,.hp-premium-cta{position:relative;padding:13px 16px;background:linear-gradient(135deg,rgba(27,15,41,.96),rgba(10,10,19,.96));border:1px solid rgba(180,122,255,.22);clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,13px 100%,0 calc(100% - 13px))}
-.hp-stat-label{font:800 9px Orbitron,sans-serif;letter-spacing:2px;color:#998BAA;text-transform:uppercase}
-.hp-stat-value{font:700 27px Teko,sans-serif;line-height:1.15;color:#FFF;margin-top:3px}
-.hp-stat-value strong{color:#FF7A00;font-weight:700}
-.hp-progress-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font:800 10px Orbitron,sans-serif;color:#D8CBEA;letter-spacing:1.2px;margin-bottom:10px}
-.hp-progress-head b{color:#00FF9D;font-family:Teko,sans-serif;font-size:19px;letter-spacing:.3px}
-.hp-progress-rail{height:11px;border:1px solid rgba(180,122,255,.4);background:#080610;overflow:hidden;transform:skewX(-9deg)}
-.hp-progress-fill{height:100%;background:linear-gradient(90deg,#B47AFF,#FF7A00,#00FF9D);box-shadow:0 0 15px rgba(180,122,255,.38);transition:width .26s ease}
-.hp-progress-foot{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font:700 11px Rajdhani,sans-serif;color:#9D91AD}
-.hp-premium-cta{border-color:rgba(255,185,66,.46);background:linear-gradient(125deg,rgba(68,37,12,.95),rgba(22,12,25,.98));display:flex;flex-direction:column;justify-content:center;gap:7px}
-.hp-premium-cta strong{font:900 12px Orbitron,sans-serif;letter-spacing:1.2px;color:#FFCA74}
-.hp-premium-cta span{font:700 12px Rajdhani,sans-serif;line-height:1.3;color:#D8C8B7}
-.hp-premium-button{align-self:flex-start;padding:8px 12px;min-height:36px;border:1px solid #FF7A00;background:linear-gradient(180deg,#FF8E24,#A74608);color:#fff;font:900 10px Orbitron,sans-serif;letter-spacing:.8px;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));cursor:pointer;touch-action:manipulation;transition:filter .15s,transform .15s}
+.hp-backdrop:before{content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,200,120,.03) 0 1px,transparent 1px 48px),
+    linear-gradient(180deg,rgba(232,99,26,.05),transparent 58%,rgba(139,90,43,.06));
+  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.hp-backdrop:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 35%,rgba(232,99,26,.10),transparent 33%),
+    radial-gradient(ellipse at 80% 72%,rgba(242,183,5,.08),transparent 30%),
+    radial-gradient(ellipse at 48% 100%,rgba(179,30,34,.10),transparent 32%)}
+
+.hp-shell{width:min(1560px,100%);height:min(940px,96vh);min-height:0;position:relative;
+  display:flex;flex-direction:column;overflow:hidden;
+  background:
+    repeating-linear-gradient(92deg,rgba(0,0,0,0) 0 2px,
+      rgba(255,255,255,.012) 2px 3px,rgba(0,0,0,.06) 3px 4px,
+      rgba(0,0,0,0) 4px 7px),
+    repeating-linear-gradient(88deg,rgba(0,0,0,0) 0 18px,
+      rgba(30,15,5,.22) 18px 19px,rgba(0,0,0,0) 19px 40px,
+      rgba(60,30,10,.16) 40px 41px),
+    linear-gradient(165deg,var(--aut-wood-dark) 0%,var(--aut-wood-mid) 45%,#241307 100%);
+  border:2px solid var(--aut-wood-warm);
+  border-top:3px solid var(--aut-orange);
+  border-bottom:3px solid var(--aut-olive-soft);
+  clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));
+  box-shadow:0 26px 90px rgba(0,0,0,.72),0 0 46px rgba(232,99,26,.10),
+    inset 0 1px rgba(255,220,170,.08),inset 0 -2px rgba(0,0,0,.4);
+  animation:hp-panel-in .32s cubic-bezier(.2,.85,.25,1) both}
+.hp-shell:before{content:"";pointer-events:none;position:absolute;left:0;top:0;
+  width:40%;height:2px;background:linear-gradient(90deg,var(--aut-orange),var(--aut-yellow),transparent);z-index:2}
+
+.hp-header{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:clamp(14px,2vw,24px) clamp(14px,2.2vw,30px) 14px;
+  background:
+    repeating-linear-gradient(91deg,rgba(0,0,0,0) 0 6px,rgba(0,0,0,.08) 6px 7px),
+    linear-gradient(180deg,#5A351A,#3E2411);
+  border-bottom:2px solid var(--aut-wood-highlight);
+  box-shadow:inset 0 1px rgba(255,200,140,.15),inset 0 -1px rgba(0,0,0,.5);flex-shrink:0}
+
+.hp-kicker{font:800 9px Orbitron,sans-serif;letter-spacing:3px;color:var(--aut-yellow);
+  text-transform:uppercase;margin-bottom:5px}
+.hp-title{font:900 clamp(22px,3vw,38px)/1.02 Orbitron,sans-serif;letter-spacing:1.3px;
+  color:var(--aut-cream);margin:0;text-shadow:0 2px 0 var(--aut-wood-dark),0 0 18px rgba(232,99,26,.35)}
+.hp-title span{color:var(--aut-orange)}
+.hp-subtitle{font:700 13px Rajdhani,sans-serif;letter-spacing:1.1px;color:var(--aut-parchment);margin-top:7px}
+
+.hp-close{min-width:44px;min-height:42px;font:900 12px Orbitron,sans-serif;color:var(--aut-cream);
+  background:linear-gradient(180deg,#3E2411,#1B0E06);border:1px solid var(--aut-wood-warm);
+  cursor:pointer;touch-action:manipulation;transition:transform .14s,box-shadow .14s,border-color .14s;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.hp-close:hover{border-color:var(--aut-orange);box-shadow:0 0 18px rgba(232,99,26,.32);transform:translateY(-1px)}
+
+.hp-content{overflow:auto;overscroll-behavior:contain;padding:16px clamp(12px,2vw,28px) 24px;
+  scrollbar-color:#8B5A2B #1B0E06;scrollbar-width:thin}
+
+.hp-summary{display:grid;grid-template-columns:minmax(210px,.9fr) minmax(250px,1.45fr) minmax(230px,1fr);
+  gap:12px;align-items:stretch;margin-bottom:18px}
+.hp-stat,.hp-progress-card,.hp-premium-cta{position:relative;padding:13px 16px;
+  background:linear-gradient(135deg,rgba(60,30,15,.97),rgba(20,10,5,.98));
+  border:1px solid var(--aut-wood-warm);
+  clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,13px 100%,0 calc(100% - 13px));
+  box-shadow:inset 0 1px rgba(255,200,140,.10),inset 0 -1px rgba(0,0,0,.5)}
+.hp-stat-label{font:800 9px Orbitron,sans-serif;letter-spacing:2px;color:var(--aut-parchment);text-transform:uppercase}
+.hp-stat-value{font:700 27px Teko,sans-serif;line-height:1.15;color:var(--aut-cream);margin-top:3px}
+.hp-stat-value strong{color:var(--aut-orange);font-weight:700}
+
+.hp-progress-head{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font:800 10px Orbitron,sans-serif;color:var(--aut-cream);letter-spacing:1.2px;margin-bottom:10px}
+.hp-progress-head b{color:var(--aut-yellow);font-family:Teko,sans-serif;font-size:19px;letter-spacing:.3px}
+.hp-progress-rail{height:11px;border:1px solid var(--aut-wood-light);
+  background:#170A04;overflow:hidden;transform:skewX(-9deg);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.8)}
+.hp-progress-fill{height:100%;
+  background:linear-gradient(90deg,var(--aut-yellow) 0%,var(--aut-orange) 45%,var(--aut-red) 100%);
+  box-shadow:0 0 12px rgba(232,99,26,.55),inset 0 1px rgba(255,230,180,.4);transition:width .26s ease}
+.hp-progress-foot{display:flex;justify-content:space-between;gap:8px;margin-top:7px;
+  font:700 11px Rajdhani,sans-serif;color:var(--aut-parchment)}
+
+.hp-premium-cta{border-color:var(--aut-gold);
+  background:linear-gradient(125deg,rgba(91,53,26,.97),rgba(40,22,12,.98));
+  display:flex;flex-direction:column;justify-content:center;gap:7px}
+.hp-premium-cta strong{font:900 12px Orbitron,sans-serif;letter-spacing:1.2px;color:var(--aut-yellow-warm)}
+.hp-premium-cta span{font:700 12px Rajdhani,sans-serif;line-height:1.3;color:var(--aut-parchment)}
+.hp-premium-button{align-self:flex-start;padding:8px 12px;min-height:36px;
+  border:1px solid var(--aut-orange);background:linear-gradient(180deg,var(--aut-orange-soft),var(--aut-orange-deep));
+  color:#fff;font:900 10px Orbitron,sans-serif;letter-spacing:.8px;cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  transition:filter .15s,transform .15s;touch-action:manipulation}
 .hp-premium-button:hover{filter:brightness(1.1);transform:translateY(-1px)}
+
 .hp-section{margin-top:18px}
 .hp-section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:9px}
-.hp-section-heading h2{margin:0;font:900 clamp(14px,1.4vw,18px) Orbitron,sans-serif;letter-spacing:1.4px;color:#EDE5F7}
-.hp-section-heading h2 em{font-style:normal;color:#FF7A00}
-.hp-section-heading small{font:700 11px Rajdhani,sans-serif;color:#8F819D;text-align:right}
-.hp-track-wrap{position:relative;border:1px solid rgba(180,122,255,.2);background:linear-gradient(180deg,rgba(10,8,18,.84),rgba(13,8,21,.68));padding:10px 7px 12px;overflow:hidden}
-.hp-track-scroll{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:5px 5px 13px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#8051A4 #0A0711;-webkit-overflow-scrolling:touch}
-.hp-tier{position:relative;display:flex;flex-direction:column;align-items:center;flex:0 0 132px;min-height:190px;padding:10px 8px 9px;text-align:center;background:linear-gradient(180deg,rgba(22,18,33,.98),rgba(8,7,14,.98));border:1px solid rgba(185,176,203,.23);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));scroll-snap-align:start;content-visibility:auto;contain-intrinsic-size:auto 200px;transition:transform .16s,border-color .16s,filter .16s}
-.hp-tier:hover{transform:translateY(-2px);border-color:#B47AFF;filter:brightness(1.06)}
-.hp-tier.hp-premium{border-color:rgba(255,194,88,.35);background:linear-gradient(180deg,rgba(58,31,18,.93),rgba(12,7,18,.99))}
-.hp-tier.hp-premium:before{content:'🔥';position:absolute;top:3px;right:4px;z-index:2;font-size:11px;line-height:1;pointer-events:none}
-.hp-tier.hp-premium:hover{border-color:#FFB84B}
-.hp-tier.hp-current{outline:1px solid #00FF9D;outline-offset:-3px}
-.hp-tier.hp-claimed{border-color:rgba(0,255,157,.48);background:linear-gradient(180deg,rgba(0,55,41,.4),rgba(8,7,14,.98))}
-.hp-tier.hp-final{border-color:#B47AFF;box-shadow:inset 0 0 12px rgba(180,122,255,.12);animation:hp-ghost-pulse 2.4s ease-in-out infinite;will-change:transform}
-.hp-tier-icon{display:flex;align-items:center;justify-content:center;width:39px;height:43px;flex-shrink:0;margin-bottom:7px;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:linear-gradient(150deg,#717985,#252735);border:0;color:#fff;font:700 24px/1 Teko,sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.5)}
-.hp-premium .hp-tier-icon{background:linear-gradient(145deg,#FFE5A4,#AE5C16);color:#291506;text-shadow:none}
-.hp-tier.hp-claimed .hp-tier-icon{background:linear-gradient(145deg,#00FF9D,#087D69);color:#04120E}
-.hp-tier-kicker{font:800 8px Orbitron,sans-serif;color:#91859D;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:5px}
-.hp-premium .hp-tier-kicker{color:#E9B77B}
-.hp-tier-reward{display:flex;align-items:center;justify-content:center;flex:1;min-height:46px;color:#F5F1FA;font:800 12px/1.25 Rajdhani,sans-serif;overflow-wrap:anywhere}
-.hp-tier-detail{font:700 10px/1.2 Rajdhani,sans-serif;color:#A59AAF;margin-top:4px;min-height:23px}
-.hp-tier.hp-premium .hp-tier-detail{color:#C4A98E}
-.hp-claim-btn{width:100%;min-height:31px;margin-top:8px;padding:6px 4px;border:1px solid rgba(180,122,255,.35);background:#151020;color:#DCCBEE;font:800 9px Orbitron,sans-serif;letter-spacing:.3px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));touch-action:manipulation}
-.hp-claim-btn:hover{border-color:#00FF9D;color:#fff;background:#10211E}
-.hp-premium .hp-claim-btn{border-color:rgba(255,184,75,.35);color:#FFD7A0;background:#201309}
+.hp-section-heading h2{margin:0;font:900 clamp(14px,1.4vw,18px) Orbitron,sans-serif;
+  letter-spacing:1.4px;color:var(--aut-cream)}
+.hp-section-heading h2 em{font-style:normal;color:var(--aut-orange)}
+.hp-section-heading small{font:700 11px Rajdhani,sans-serif;color:var(--aut-parchment);text-align:right}
+
+.hp-track-wrap{position:relative;border:1px solid var(--aut-wood-warm);
+  background:linear-gradient(180deg,rgba(27,14,6,.94),rgba(20,10,5,.82));padding:10px 7px 12px;overflow:hidden}
+.hp-track-scroll{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:5px 5px 13px;
+  scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#8B5A2B #170A04;-webkit-overflow-scrolling:touch}
+
+.hp-tier{position:relative;display:flex;flex-direction:column;align-items:center;flex:0 0 132px;
+  min-height:190px;padding:10px 8px 9px;text-align:center;
+  background:
+    repeating-linear-gradient(90deg,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.05) 3px 4px),
+    linear-gradient(180deg,#35200F,#1B0E06);
+  border:1px solid var(--aut-wood-warm);
+  box-shadow:inset 0 1px rgba(255,190,120,.08),inset 0 -1px rgba(0,0,0,.55),
+    0 2px 0 rgba(0,0,0,.5);
+  clip-path:none;scroll-snap-align:start;content-visibility:auto;
+  contain-intrinsic-size:auto 200px;transition:transform .16s,border-color .16s,filter .16s}
+.hp-tier::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(0,0,0,.7),rgba(0,0,0,.4))}
+.hp-tier:hover{transform:translateY(-2px);border-color:var(--aut-orange);filter:brightness(1.06)}
+.hp-tier.hp-premium{border-color:var(--aut-gold);
+  background:linear-gradient(180deg,rgba(91,53,26,.95),rgba(30,16,8,.99))}
+.hp-tier.hp-premium:before{content:'🍁';position:absolute;top:3px;right:4px;z-index:2;
+  font-size:11px;line-height:1;pointer-events:none}
+.hp-tier.hp-premium:hover{border-color:var(--aut-yellow)}
+.hp-tier.hp-current{outline:1px solid var(--aut-yellow);outline-offset:-3px}
+.hp-tier.hp-claimed{border-color:var(--aut-olive-soft);
+  background:linear-gradient(180deg,rgba(45,58,20,.4),rgba(20,10,5,.98))}
+.hp-tier.hp-final{border-color:var(--aut-orange);
+  box-shadow:inset 0 0 12px rgba(232,99,26,.18);animation:hp-leaf-pulse 2.4s ease-in-out infinite;
+  will-change:transform}
+
+.hp-tier-icon{display:flex;align-items:center;justify-content:center;width:39px;height:43px;
+  flex-shrink:0;margin-bottom:7px;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  background:linear-gradient(150deg,#6B4226,#2B1A0E);
+  border:0;color:var(--aut-cream);font:700 24px/1 Teko,sans-serif;
+  text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.hp-premium .hp-tier-icon{background:linear-gradient(145deg,var(--aut-yellow-warm),var(--aut-gold));color:#291506;text-shadow:none}
+.hp-tier.hp-claimed .hp-tier-icon{background:linear-gradient(145deg,var(--aut-olive-soft),#4A5A0F);color:#0F1605}
+.hp-tier-kicker{font:800 8px Orbitron,sans-serif;color:var(--aut-parchment);letter-spacing:1.3px;text-transform:uppercase;margin-bottom:5px}
+.hp-premium .hp-tier-kicker{color:var(--aut-yellow-warm)}
+.hp-tier-reward{display:flex;align-items:center;justify-content:center;flex:1;min-height:46px;
+  color:var(--aut-cream);font:800 12px/1.25 Rajdhani,sans-serif;overflow-wrap:anywhere}
+.hp-tier-detail{font:700 10px/1.2 Rajdhani,sans-serif;color:var(--aut-parchment);margin-top:4px;min-height:23px}
+.hp-tier.hp-premium .hp-tier-detail{color:var(--aut-yellow-warm)}
+
+.hp-claim-btn{width:100%;min-height:31px;margin-top:8px;padding:6px 4px;
+  border:1px solid var(--aut-wood-highlight);background:linear-gradient(180deg,#3E2411,#1B0E06);
+  color:var(--aut-cream);font:800 9px Orbitron,sans-serif;letter-spacing:.3px;cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+  touch-action:manipulation}
+.hp-claim-btn:hover{border-color:var(--aut-orange);color:#fff;
+  background:linear-gradient(180deg,var(--aut-orange-deep),#3E2411)}
+.hp-premium .hp-claim-btn{border-color:var(--aut-gold);color:var(--aut-yellow-warm);
+  background:linear-gradient(180deg,#3E2411,#1B0E06)}
 .hp-claim-btn:disabled{cursor:default;opacity:.55;filter:saturate(.6)}
+
 .hp-quests{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:9px}
-.hp-quest{display:flex;flex-direction:column;gap:8px;min-height:134px;padding:12px;background:linear-gradient(145deg,rgba(23,17,34,.95),rgba(7,8,14,.98));border:1px solid rgba(0,255,157,.2);clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px))}
-.hp-quest.hp-quest-done{border-color:rgba(0,255,157,.48)}
-.hp-quest-title{font:800 12px/1.25 Rajdhani,sans-serif;color:#F2ECF9;min-height:30px}
-.hp-quest-meta{display:flex;justify-content:space-between;gap:5px;font:800 10px Orbitron,sans-serif;color:#9588A4}
-.hp-quest-meta strong{color:#00FF9D}
-.hp-quest-rail{height:5px;background:#171122;overflow:hidden}
-.hp-quest-fill{height:100%;background:linear-gradient(90deg,#B47AFF,#00FF9D);transition:width .2s}
-.hp-quest-button{margin-top:auto;width:100%;min-height:32px;padding:6px;border:1px solid rgba(0,255,157,.35);background:rgba(0,50,37,.55);color:#B7FFE2;font:800 9px Orbitron,sans-serif;cursor:pointer;touch-action:manipulation}
+.hp-quest{display:flex;flex-direction:column;gap:8px;min-height:134px;padding:12px;
+  background:linear-gradient(145deg,#2E1C0F,rgba(15,8,4,.98));
+  border:1px solid var(--aut-olive);
+  clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px))}
+.hp-quest.hp-quest-done{border-color:var(--aut-olive-soft);
+  box-shadow:inset 0 0 14px rgba(143,160,40,.12)}
+.hp-quest-title{font:800 12px/1.25 Rajdhani,sans-serif;color:var(--aut-cream);min-height:30px}
+.hp-quest-meta{display:flex;justify-content:space-between;gap:5px;
+  font:800 10px Orbitron,sans-serif;color:var(--aut-parchment)}
+.hp-quest-meta strong{color:var(--aut-yellow)}
+.hp-quest-rail{height:5px;background:#170A04;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
+.hp-quest-fill{height:100%;
+  background:linear-gradient(90deg,var(--aut-yellow),var(--aut-orange),var(--aut-red));
+  transition:width .2s}
+.hp-quest-button{margin-top:auto;width:100%;min-height:32px;padding:6px;
+  border:1px solid var(--aut-olive-soft);background:rgba(45,58,20,.55);
+  color:var(--aut-yellow-warm);font:800 9px Orbitron,sans-serif;cursor:pointer;touch-action:manipulation}
+.hp-quest-button:hover:not(:disabled){border-color:var(--aut-yellow);color:#fff}
 .hp-quest-button:disabled{opacity:.45;cursor:default}
-.hp-footnote{margin-top:15px;color:#82768F;font:700 11px/1.4 Rajdhani,sans-serif;letter-spacing:.4px}
-.hp-empty{color:#7E718C;font:700 11px Rajdhani,sans-serif}
-.hp-level-shop{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:16px 0 18px;padding:16px;background:linear-gradient(115deg,rgba(40,22,54,.97),rgba(10,13,19,.98));border:1px solid rgba(255,122,0,.38);border-left:3px solid #FF7A00;clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,13px 100%,0 calc(100% - 13px))}
-.hp-level-shop-copy{flex:1 1 270px;min-width:0}
-.hp-level-shop-title{margin:4px 0 5px;color:#FFF;font:900 clamp(14px,1.5vw,19px)/1.2 Orbitron,sans-serif;letter-spacing:.7px}
-.hp-level-shop-desc{margin:0;color:#B9AEC9;font:700 12px/1.4 Rajdhani,sans-serif}
-.hp-level-shop-wallet{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;color:#9D91AD;font:800 9px Orbitron,sans-serif;letter-spacing:1px}
-.hp-level-shop-wallet strong{color:#FFD36E;font:700 21px/1 Teko,sans-serif;letter-spacing:.3px}
-.hp-level-shop-wallet span:last-child{color:#00FF9D}
-.hp-level-shop-buttons{display:flex;flex:0 1 auto;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.hp-level-buy-button{min-height:40px;padding:9px 12px;border:1px solid rgba(255,122,0,.55);background:linear-gradient(180deg,#51290F,#211126);color:#FFE6C7;font:900 9px Orbitron,sans-serif;letter-spacing:.4px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));touch-action:manipulation;transition:transform .14s,border-color .14s,filter .14s}
-.hp-level-buy-button:hover:not(:disabled){transform:translateY(-1px);border-color:#FFB15C;filter:brightness(1.08)}
+
+.hp-level-shop{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;margin:16px 0 18px;padding:16px;
+  background:linear-gradient(115deg,rgba(91,53,26,.97),rgba(20,10,5,.98));
+  border:1px solid var(--aut-orange);border-left:3px solid var(--aut-orange);
+  clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,13px 100%,0 calc(100% - 13px))}
+.hp-level-shop-title{margin:4px 0 5px;color:var(--aut-cream);
+  font:900 clamp(14px,1.5vw,19px)/1.2 Orbitron,sans-serif;letter-spacing:.7px}
+.hp-level-shop-desc{margin:0;color:var(--aut-parchment);font:700 12px/1.4 Rajdhani,sans-serif}
+.hp-level-shop-wallet{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:8px;color:var(--aut-parchment);
+  font:800 9px Orbitron,sans-serif;letter-spacing:1px}
+.hp-level-shop-wallet strong{color:var(--aut-yellow-warm);font:700 21px/1 Teko,sans-serif;letter-spacing:.3px}
+.hp-level-shop-wallet span:last-child{color:var(--aut-olive-soft)}
+.hp-level-buy-button{min-height:40px;padding:9px 12px;
+  border:1px solid var(--aut-orange);
+  background:linear-gradient(180deg,#5A2A0E,#2B1409);
+  color:var(--aut-cream);font:900 9px Orbitron,sans-serif;letter-spacing:.4px;cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
+  transition:transform .14s,border-color .14s,filter .14s;touch-action:manipulation}
+.hp-level-buy-button:hover:not(:disabled){transform:translateY(-1px);
+  border-color:var(--aut-yellow);filter:brightness(1.08)}
 .hp-level-buy-button:disabled{opacity:.45;cursor:default;filter:saturate(.45)}
-.hp-weekly-head-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;max-width:58%}.hp-weekly-head-meta small{font:700 11px Rajdhani,sans-serif;color:#B9AEC9;text-align:right}.hp-weekly-head-meta .hp-weekly-countdown{font:800 10px Orbitron,sans-serif;color:#FFD36E;letter-spacing:.4px;text-shadow:0 0 10px rgba(255,122,0,.22)}.hp-section[data-weekly-section="true"] .hp-quest{border-color:rgba(255,122,0,.24);background:linear-gradient(145deg,rgba(39,20,28,.95),rgba(7,8,14,.98))}.hp-section[data-weekly-section="true"] .hp-quest.hp-quest-done{border-color:rgba(0,255,157,.48)}.hp-section[data-weekly-section="true"] .hp-quest-fill{background:linear-gradient(90deg,#FF7A00,#B47AFF,#00FF9D)}
+
+.hp-cycle-reset-panel{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:12px 0 18px;padding:15px 17px;background:linear-gradient(120deg,rgba(107,122,31,.22),rgba(43,26,14,.96));border:1px solid var(--aut-yellow);border-left:3px solid var(--aut-yellow);box-shadow:inset 0 0 18px rgba(242,183,5,.06)}
+.hp-cycle-reset-panel[hidden]{display:none!important}
+.hp-cycle-reset-copy{display:flex;flex-direction:column;gap:5px;min-width:220px;flex:1}
+.hp-cycle-reset-copy strong{font:900 11px Orbitron,sans-serif;letter-spacing:1px;color:var(--aut-yellow-warm)}
+.hp-cycle-reset-copy span{font:700 12px/1.4 Rajdhani,sans-serif;color:var(--aut-parchment)}
+.hp-cycle-reset-button{min-height:40px;padding:10px 15px;border:1px solid var(--aut-yellow);background:linear-gradient(180deg,#8A5A12,#482609);color:#FFF2C9;font:900 10px Orbitron,sans-serif;letter-spacing:.7px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:filter .15s,transform .15s}
+.hp-cycle-reset-button:hover{filter:brightness(1.15);transform:translateY(-1px)}
+
+.hp-weekly-head-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;max-width:58%}
+.hp-weekly-head-meta small{font:700 11px Rajdhani,sans-serif;color:var(--aut-parchment);text-align:right}
+.hp-weekly-head-meta .hp-weekly-countdown{font:800 10px Orbitron,sans-serif;
+  color:var(--aut-yellow);letter-spacing:.4px;text-shadow:0 0 10px rgba(242,183,5,.3)}
+.hp-section[data-weekly-section="true"] .hp-quest{
+  border-color:var(--aut-orange);
+  background:linear-gradient(145deg,#3E2411,rgba(15,8,4,.98))}
+.hp-section[data-weekly-section="true"] .hp-quest.hp-quest-done{border-color:var(--aut-olive-soft)}
+.hp-section[data-weekly-section="true"] .hp-quest-fill{
+  background:linear-gradient(90deg,var(--aut-yellow),var(--aut-orange),var(--aut-red))}
+
+.hp-footnote{margin-top:15px;color:var(--aut-parchment);font:700 11px/1.4 Rajdhani,sans-serif;letter-spacing:.4px}
+.hp-empty{color:var(--aut-parchment);font:700 11px Rajdhani,sans-serif}
+
 @keyframes hp-backdrop-in{from{opacity:0}to{opacity:1}}
 @keyframes hp-panel-in{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes hp-ghost-pulse{0%,100%{box-shadow:inset 0 0 8px rgba(180,122,255,.08),0 0 4px rgba(180,122,255,.04)}50%{box-shadow:inset 0 0 14px rgba(180,122,255,.17),0 0 10px rgba(180,122,255,.13)}}
-@media(max-width:980px){.hp-shell{height:96vh}.hp-summary{grid-template-columns:1fr 1.25fr}.hp-premium-cta{grid-column:1/-1}.hp-quests{grid-template-columns:repeat(2,minmax(0,1fr))}.hp-tier{flex-basis:120px;min-height:180px}}
-@media(max-width:560px){.hp-weekly-head-meta{align-items:flex-start;max-width:100%}.hp-weekly-head-meta small{text-align:left}.hp-level-shop{align-items:stretch;padding:12px}.hp-level-shop-buttons{display:grid;grid-template-columns:1fr;flex-basis:100%}.hp-level-buy-button{width:100%;min-height:38px}.hp-backdrop{padding:4px}.hp-shell{width:100%;height:98vh;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}.hp-header{align-items:flex-start;padding:14px 11px 11px;gap:8px}.hp-title{font-size:21px}.hp-subtitle{font-size:11px}.hp-close{min-width:37px;min-height:37px;font-size:10px}.hp-content{padding:10px 9px 18px}.hp-summary{grid-template-columns:1fr 1fr;gap:8px}.hp-progress-card{grid-column:1/-1;grid-row:1}.hp-stat{padding:10px}.hp-stat-value{font-size:23px}.hp-premium-cta{grid-column:1/-1}.hp-section-heading{align-items:flex-start;flex-direction:column}.hp-section-heading small{text-align:left}.hp-tier{flex-basis:112px;min-height:174px;padding:8px 6px}.hp-tier-reward{font-size:11px}.hp-quests{grid-template-columns:1fr}.hp-quest{min-height:120px}}
-.hp-tier,.hp-progress-fill,.hp-premium-button{will-change:auto}
-@media(prefers-reduced-motion:reduce){.hp-backdrop:before,.hp-backdrop:after,.hp-tier.hp-final{animation:none!important}.hp-tier,.hp-progress-fill,.hp-premium-button{transition:none!important}}
+@keyframes hp-leaf-pulse{0%,100%{box-shadow:inset 0 0 8px rgba(232,99,26,.10),0 0 4px rgba(232,99,26,.06)}
+  50%{box-shadow:inset 0 0 16px rgba(232,99,26,.22),0 0 12px rgba(232,99,26,.18)}}
+
+@media(max-width:980px){
+  .hp-shell{height:96vh}
+  .hp-summary{grid-template-columns:1fr 1.25fr}
+  .hp-premium-cta{grid-column:1/-1}
+  .hp-quests{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hp-tier{flex-basis:120px;min-height:180px}}
+@media(max-width:560px){
+  .hp-weekly-head-meta{align-items:flex-start;max-width:100%}
+  .hp-weekly-head-meta small{text-align:left}
+  .hp-level-shop{align-items:stretch;padding:12px}
+  .hp-level-shop-buttons{display:grid;grid-template-columns:1fr;flex-basis:100%}
+  .hp-level-buy-button{width:100%;min-height:38px}
+  .hp-backdrop{padding:4px}
+  .hp-shell{width:100%;height:98vh;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+  .hp-header{align-items:flex-start;padding:14px 11px 11px;gap:8px}
+  .hp-title{font-size:21px}.hp-subtitle{font-size:11px}
+  .hp-content{padding:10px 9px 18px}
+  .hp-summary{grid-template-columns:1fr 1fr;gap:8px}
+  .hp-progress-card{grid-column:1/-1;grid-row:1}
+  .hp-quests{grid-template-columns:1fr}}
+
+/* Canvas foglie: decorazione isolata sopra il backdrop e sotto la shell. */
+#autumnLeavesCanvas{
+  position:absolute!important; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:1; display:block;
+  border:0!important; background:transparent!important;
+  box-shadow:none!important; clip-path:none!important; outline:none!important;
+}
+#halloweenPassShell{position:relative;z-index:2}
+
 
 </style>
+    <link rel="icon" type="image/png" href="build/icon.png">
 </head>
 <body>
 
@@ -207,7 +403,7 @@ AI MAINTENANCE CONTRACT — READ BEFORE EDITING THIS GAME
         <button id="shopBtn" class="hud-btn" onclick="goToShop()">Shop 🛒</button>
         <button id="invBtn" class="hud-btn" onclick="goToInventory()">Inventario 🎒</button>
         <button id="questBtn" class="hud-btn" onclick="goToQuests()">Missioni 📋</button>
-        <button id="halloweenPassBtn" class="hud-btn" onclick="openHalloweenPassUI()">🎃 Battle Pass</button>
+        <button id="halloweenPassBtn" class="hud-btn" onclick="openHalloweenPassUI()">🍂 Battle Pass</button>
         <button id="adminBtn" class="hud-btn" onclick="openAdminPanel()">Admin</button>
         <button id="logoutBtn" class="hud-btn" onclick="handleLogout()">Logout</button>
         <button id="saveDataBtn" class="hud-btn" onclick="openSaveDataModal()" style="background:linear-gradient(135deg,#20334A,#111827);border-color:#65D8FF">💾 SAVE DATA</button>
@@ -284,6 +480,7 @@ AI MAINTENANCE CONTRACT — READ BEFORE EDITING THIS GAME
 </div>
 
 <div id="halloweenPassOverlay" class="hp-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="hpDialogTitle">
+  <canvas id="autumnLeavesCanvas" aria-hidden="true"></canvas>
   <div id="halloweenPassShell" class="hp-shell"></div>
 </div>
 
@@ -504,10 +701,10 @@ for (const row of _i18nRows) {
 }
 function _normalizeI18nText(value) { return String(value ?? '').trim().replace(/\s+/g, ' '); }
 const HALLOWEEN_PASS_I18N = {
-  pass_halloween_title: {it:'BATTLE PASS HALLOWEEN',en:'HALLOWEEN BATTLE PASS',fr:'PASSE HALLOWEEN',es:'PASE HALLOWEEN'},
-  pass_halloween_subtitle: {it:'EGOIST SPOOK // 30 TIER DI RICOMPENSE CYBER-ORROR',en:'EGOIST SPOOK // 30 CYBER-HORROR REWARD TIERS',fr:'EGOIST SPOOK // 30 PALIERS CYBER-HORREUR',es:'EGOIST SPOOK // 30 NIVELES CYBER-TERROR'},
+  pass_halloween_title: {it:'BATTLE PASS AUTUNNO',en:'AUTUMN BATTLE PASS',fr:'PASSE AUTOMNE',es:'PASE DE OTOÑO'},
+  pass_halloween_subtitle: {it:'EGOIST AUTUMN // 30 TIER DI RICOMPENSE AUTUNNALI',en:'EGOIST AUTUMN // 30 AUTUMN REWARD TIERS',fr:'EGOIST AUTOMNE // 30 PALIERS AUTOMNALES',es:'EGOIST OTOÑO // 30 NIVELES OTOÑALES'},
   pass_close: {it:'CHIUDI ✕',en:'CLOSE ✕',fr:'FERMER ✕',es:'CERRAR ✕'},
-  pass_season: {it:'STAGIONE • HALLOWEEN',en:'SEASON • HALLOWEEN',fr:'SAISON • HALLOWEEN',es:'TEMPORADA • HALLOWEEN'},
+  pass_season: {it:'STAGIONE • AUTUNNO',en:'SEASON • AUTUMN',fr:'SAISON • AUTOMNE',es:'TEMPORADA • OTOÑO'},
   pass_level: {it:'LIVELLO',en:'LEVEL',fr:'NIVEAU',es:'NIVEL'},
   pass_exp_total: {it:'EXP TOTALE',en:'TOTAL EXP',fr:'EXP TOTALE',es:'EXP TOTAL'},
   pass_progress: {it:'PROGRESSO PASS',en:'PASS PROGRESS',fr:'PROGRESSION DU PASS',es:'PROGRESO DEL PASE'},
@@ -528,7 +725,7 @@ const HALLOWEEN_PASS_I18N = {
   pass_premium_bought: {it:'Pass Premium sbloccato! Bonus EXP/Yen +1% attivo.',en:'Premium Pass unlocked! +1% EXP/Yen bonus active.',fr:'Pass Premium débloqué ! Bonus EXP/Yens +1 % actif.',es:'¡Pase Premium desbloqueado! Bonificación de EXP/Yen +1% activa.'},
   pass_premium_already: {it:'Il Pass Premium è già attivo.',en:'The Premium Pass is already active.',fr:'Le Pass Premium est déjà actif.',es:'El Pase Premium ya está activo.'},
   pass_not_enough_yen: {it:'Ti servono 5.000 ¥ per il Pass Premium.',en:'You need 5,000 ¥ for the Premium Pass.',fr:'Il vous faut 5 000 ¥ pour le Pass Premium.',es:'Necesitas 5.000 ¥ para el Pase Premium.'},
-  pass_reward_claimed: {it:'Ricompensa Halloween riscattata!',en:'Halloween reward claimed!',fr:'Récompense Halloween récupérée !',es:'¡Recompensa de Halloween reclamada!'},
+  pass_reward_claimed: {it:'Ricompensa autunnale riscattata!',en:'Autumn reward claimed!',fr:'Récompense automnale récupérée !',es:'¡Recompensa de otoño reclamada!'},
   pass_reward_yen: {it:'{amount} ¥',en:'{amount} ¥',fr:'{amount} ¥',es:'{amount} ¥'},
   pass_reward_standard_spin: {it:'{count} × Spin Standard',en:'{count} × Standard Spin',fr:'{count} × Tour standard',es:'{count} × Giro estándar'},
   pass_reward_style_spins: {it:'{count} × Spin Stili',en:'{count} × Style Spin',fr:'{count} × Tour de style',es:'{count} × Giro de estilo'},
@@ -536,23 +733,35 @@ const HALLOWEEN_PASS_I18N = {
   pass_reward_yen_pack_five: {it:'5 × PACCHETTO YEN · +3.000 ¥ CAD.',en:'5 × YEN PACK · +3,000 ¥ EACH',fr:'5 × LOT DE YENS · +3 000 ¥ CHACUN',es:'5 × PAQUETE YEN · +3.000 ¥ CADA UNO'},
   pass_reward_yen_large: {it:'PACCHETTO YEN GRANDE · +10.000 ¥',en:'LARGE YEN PACK · +10,000 ¥',fr:'GRAND LOT DE YENS · +10 000 ¥',es:'PAQUETE GRANDE DE YEN · +10.000 ¥'},
   pass_reward_yen_mega: {it:'PACCHETTO YEN MEGA · +20.000 ¥',en:'MEGA YEN PACK · +20,000 ¥',fr:'MÉGA LOT DE YENS · +20 000 ¥',es:'PAQUETE MEGA DE YEN · +20.000 ¥'},
-  pass_reward_gradient_toxic: {it:'Gradiente Giocatore • Toxic Slime',en:'Player Gradient • Toxic Slime',fr:'Dégradé joueur • Toxic Slime',es:'Degradado de jugador • Toxic Slime'},
-  pass_reward_gradient_midnight: {it:'Gradiente Giocatore • Midnight Spectral',en:'Player Gradient • Midnight Spectral',fr:'Dégradé joueur • Midnight Spectral',es:'Degradado de jugador • Midnight Spectral'},
-  pass_reward_gradient_toxic_premium: {it:'Gradiente Giocatore • Toxic Slime Premium',en:'Player Gradient • Toxic Slime Premium',fr:'Dégradé joueur • Toxic Slime Premium',es:'Degradado de jugador • Toxic Slime Premium'},
-  pass_reward_gradient_blood_moon: {it:'Gradiente Giocatore • Blood Moon',en:'Player Gradient • Blood Moon',fr:'Dégradé joueur • Blood Moon',es:'Degradado de jugador • Blood Moon'},
+  pass_reward_gradient_toxic: {it:'Gradiente Autunno • Amber Glow',en:'Player Gradient • Amber Glow',fr:'Dégradé joueur • Ambre lumineux',es:'Degradado de jugador • Brillo ámbar'},
+  pass_reward_gradient_midnight: {it:'Gradiente Autunno • Notte Autunnale',en:'Player Gradient • Deep Autumn Night',fr:'Dégradé joueur • Nuit d’automne',es:'Degradado de jugador • Noche otoñal'},
+  pass_reward_gradient_toxic_premium: {it:'Gradiente Autunno • Golden Harvest',en:'Player Gradient • Golden Harvest',fr:'Dégradé joueur • Récolte dorée',es:'Degradado de jugador • Cosecha dorada'},
+  pass_reward_gradient_blood_moon: {it:'Gradiente Autunno • Foglie Cremisi',en:'Player Gradient • Crimson Leaves',fr:'Dégradé joueur • Feuilles cramoisies',es:'Degradado de jugador • Hojas carmesí'},
   pass_reward_ball_pumpkin: {it:'Skin Palla • Palla Zucca Standard',en:'Ball Skin • Standard Pumpkin Ball',fr:'Skin de ballon • Ballon citrouille standard',es:'Skin de balón • Balón calabaza estándar'},
   pass_reward_ball_mechanical: {it:'Skin Palla • Palla Zucca Meccanica',en:'Ball Skin • Mechanical Pumpkin Ball',fr:'Skin de ballon • Citrouille mécanique',es:'Skin de balón • Calabaza mecánica'},
   pass_reward_ball_oculo: {it:'Skin Palla • Palla Oculo Spettrale',en:'Ball Skin • Spectral Eyeball',fr:'Skin de ballon • Œil spectral',es:'Skin de balón • Ojo espectral'},
   pass_reward_ball_ghost: {it:'Skin Palla • Palla Fantasma',en:'Ball Skin • Ghost Ball',fr:'Skin de ballon • Ballon fantôme',es:'Skin de balón • Balón fantasma'},
   pass_reward_goal_pumpkin: {it:'Goal Explosion • Pumpkin Blast',en:'Goal Explosion • Pumpkin Blast',fr:'Explosion de but • Pumpkin Blast',es:'Explosión de gol • Pumpkin Blast'},
   pass_reward_goal_portal: {it:'Goal Explosion • Ghost Portal',en:'Goal Explosion • Ghost Portal',fr:'Explosion de but • Ghost Portal',es:'Explosión de gol • Ghost Portal'},
+  pass_reward_gradient_autumn_amber: {it:'Gradiente Autunno • Autumn Amber',en:'Player Gradient • Autumn Amber',fr:'Dégradé joueur • Ambre d’automne',es:'Degradado de jugador • Ámbar otoñal'},
+  pass_reward_gradient_forest_olive: {it:'Gradiente Autunno • Forest Olive',en:'Player Gradient • Forest Olive',fr:'Dégradé joueur • Olive des bois',es:'Degradado de jugador • Oliva del bosque'},
+  pass_reward_ball_red_leaf: {it:'Skin Palla • Foglia Rossa',en:'Ball Skin • Red Leaf',fr:'Skin de ballon • Feuille rouge',es:'Skin de balón • Hoja roja'},
+  pass_reward_ball_bronze_leaf: {it:'Skin Palla • Foglia Bronzea',en:'Ball Skin • Bronze Leaf',fr:'Skin de ballon • Feuille de bronze',es:'Skin de balón • Hoja de bronce'},
+  pass_reward_ball_acorn: {it:'Skin Palla • Ghianda Dorata',en:'Ball Skin • Golden Acorn',fr:'Skin de ballon • Gland doré',es:'Skin de balón • Bellota dorada'},
+  pass_reward_ball_mist: {it:'Skin Palla • Nebbia Autunnale',en:'Ball Skin • Autumn Mist',fr:'Skin de ballon • Brume d’automne',es:'Skin de balón • Niebla otoñal'},
+  pass_reward_ball_harvest_moon: {it:'Skin Palla • Luna di Raccolta',en:'Ball Skin • Harvest Moon',fr:'Skin de ballon • Lune des récoltes',es:'Skin de balón • Luna de cosecha'},
+  pass_reward_ball_maple: {it:'Skin Palla • Foglia d’Acero',en:'Ball Skin • Maple Leaf',fr:'Skin de ballon • Feuille d’érable',es:'Skin de balón • Hoja de arce'},
+  pass_reward_goal_leaf_burst: {it:'Goal Explosion • Leaf Burst',en:'Goal Explosion • Leaf Burst',fr:'Explosion de but • Leaf Burst',es:'Explosión de gol • Leaf Burst'},
+  pass_reward_goal_amber_swirl: {it:'Goal Explosion • Amber Swirl',en:'Goal Explosion • Amber Swirl',fr:'Explosion de but • Amber Swirl',es:'Explosión de gol • Amber Swirl'},
+  pass_reward_goal_leaf_storm: {it:'Goal Explosion • Leaf Storm',en:'Goal Explosion • Leaf Storm',fr:'Explosion de but • Leaf Storm',es:'Explosión de gol • Leaf Storm'},
+  pass_reward_goal_harvest_rune: {it:'Goal Explosion • Harvest Rune',en:'Goal Explosion • Harvest Rune',fr:'Explosion de but • Harvest Rune',es:'Explosión de gol • Harvest Rune'},
   pass_reward_bonus: {it:'Boost stagione • +1% EXP/Yen',en:'Season Boost • +1% EXP/Yen',fr:'Bonus de saison • +1 % EXP/Yens',es:'Bonificación de temporada • +1% EXP/Yen'},
   pass_reward_owned_convert: {it:'Già posseduto → +{amount} ¥',en:'Already owned → +{amount} ¥',fr:'Déjà possédé → +{amount} ¥',es:'Ya obtenido → +{amount} ¥'},
-  pass_quests_title: {it:'MISSIONI EGOIST SPOOK',en:'EGOIST SPOOK QUESTS',fr:'QUÊTES EGOIST SPOOK',es:'MISIONES EGOIST SPOOK'},
+  pass_quests_title: {it:'🍁 MISSIONI AUTUNNO',en:'🍁 AUTUMN QUESTS',fr:'🍁 MISSIONS D’AUTOMNE',es:'🍁 MISIONES DE OTOÑO'},
   pass_quests_hint: {it:'Completa gli obiettivi e riscatta l’EXP per avanzare nel pass.',en:'Complete objectives and claim their EXP to progress through the pass.',fr:'Terminez les objectifs et récupérez leur EXP pour progresser.',es:'Completa los objetivos y reclama su EXP para avanzar.'},
   pass_quest_claim: {it:'RISCATTA EXP',en:'CLAIM EXP',fr:'RÉCUPÉRER EXP',es:'RECLAMAR EXP'},
   pass_quest_claimed: {it:'EXP RISCATTATA ✓',en:'EXP CLAIMED ✓',fr:'EXP RÉCUPÉRÉE ✓',es:'EXP RECLAMADA ✓'},
-  pass_quest_matches: {it:'Gioca 2 partite Halloween',en:'Play 2 Halloween matches',fr:'Jouez 2 matchs Halloween',es:'Juega 2 partidos de Halloween'},
+  pass_quest_matches: {it:'Gioca 2 partite autunnali',en:'Play 2 Autumn matches',fr:'Jouez 2 matchs d’automne',es:'Juega 2 partidos de otoño'},
   pass_quest_special_goals: {it:'Segna 3 gol con tiro [C]',en:'Score 3 goals with shot [C]',fr:'Marquez 3 buts avec le tir [C]',es:'Marca 3 goles con el tiro [C]'},
   pass_quest_dribbles: {it:'Esegui 5 dribbling [Q]',en:'Perform 5 dribbles [Q]',fr:'Effectuez 5 dribbles [Q]',es:'Realiza 5 regates [Q]'},
   pass_quest_clean_sheet: {it:'Vinci 1 partita senza subire gol',en:'Win 1 match without conceding',fr:'Gagnez 1 match sans encaisser de but',es:'Gana 1 partido sin recibir goles'},
@@ -565,7 +774,7 @@ const HALLOWEEN_PASS_I18N = {
   pass_max_level: {it:'LIVELLO MASSIMO',en:'MAX LEVEL',fr:'NIVEAU MAX',es:'NIVEL MÁXIMO'},
   pass_exp_cap: {it:'La stagione ha raggiunto il livello massimo.',en:'The season has reached max level.',fr:'La saison a atteint le niveau maximal.',es:'La temporada alcanzó el nivel máximo.'},
   pass_bonus_active: {it:'Bonus Premium attivo: +1% Yen/EXP; tier 22 aggiunge un ulteriore +1%.',en:'Premium bonus active: +1% Yen/EXP; tier 22 adds a further +1%.',fr:'Bonus Premium actif : +1 % Yens/EXP ; le palier 22 ajoute +1 %.',es:'Bonificación Premium activa: +1% Yen/EXP; el nivel 22 añade otro +1%.'},
-  pass_level_shop_kicker: {it:'EGOIST SPOOK • NEGOZIO PROGRESSIONE',en:'EGOIST SPOOK • PROGRESSION SHOP',fr:'EGOIST SPOOK • BOUTIQUE DE PROGRESSION',es:'EGOIST SPOOK • TIENDA DE PROGRESIÓN'},
+  pass_level_shop_kicker: {it:'EGOIST AUTUMN • NEGOZIO PROGRESSIONE',en:'EGOIST AUTUMN • PROGRESSION SHOP',fr:'EGOIST AUTOMNE • BOUTIQUE DE PROGRESSION',es:'EGOIST OTOÑO • TIENDA DE PROGRESIÓN'},
   pass_buy_levels_title: {it:'ACQUISTA LIVELLI CON YEN',en:'BUY PASS LEVELS WITH YEN',fr:'ACHETER DES NIVEAUX AVEC DES YENS',es:'COMPRAR NIVELES CON YEN'},
   pass_buy_levels_desc: {it:'Ogni livello costa 1.000 ¥. Acquista 1, 5 o 10 livelli alla volta; il costo si adatta ai livelli rimasti.',en:'Each level costs 1,000 ¥. Buy 1, 5 or 10 levels at a time; the price adjusts to the levels remaining.',fr:'Chaque niveau coûte 1 000 ¥. Achetez 1, 5 ou 10 niveaux à la fois ; le prix s’adapte aux niveaux restants.',es:'Cada nivel cuesta 1.000 ¥. Compra 1, 5 o 10 niveles a la vez; el precio se ajusta a los niveles restantes.'},
   pass_available_yen: {it:'YEN DISPONIBILI',en:'AVAILABLE YEN',fr:'YENS DISPONIBLES',es:'YEN DISPONIBLES'},
@@ -576,11 +785,11 @@ const HALLOWEEN_PASS_I18N = {
   pass_levels_bought_many: {it:'Acquistati {count} livelli! Ora sei al livello {level} • -{cost} ¥.',en:'Purchased {count} levels! You are now level {level} • -{cost} ¥.',fr:'{count} niveaux achetés ! Vous êtes maintenant au niveau {level} • -{cost} ¥.',es:'¡Compraste {count} niveles! Ahora estás en el nivel {level} • -{cost} ¥.'},
   pass_level_buy_not_enough: {it:'Ti servono {cost} ¥ per acquistare {count} livelli.',en:'You need {cost} ¥ to buy {count} levels.',fr:'Il vous faut {cost} ¥ pour acheter {count} niveaux.',es:'Necesitas {cost} ¥ para comprar {count} niveles.'},
   pass_level_buy_max: {it:'Hai già raggiunto il livello massimo del Battle Pass.',en:'You have already reached the Battle Pass level cap.',fr:'Vous avez déjà atteint le niveau maximal du Pass.',es:'Ya alcanzaste el nivel máximo del pase.'},
-  pass_weekly_title: {it:'MISSIONI SETTIMANALI',en:'WEEKLY MISSIONS',fr:'MISSIONS HEBDOMADAIRES',es:'MISIONES SEMANALES'},
+  pass_weekly_title: {it:'🍂 MISSIONI SETTIMANALI',en:'🍂 WEEKLY MISSIONS',fr:'🍂 MISSIONS HEBDOMADAIRES',es:'🍂 MISIONES SEMANALES'},
   pass_weekly_hint: {it:'Completa 5 obiettivi indipendenti. I progressi ripartono ogni lunedì.',en:'Complete 5 independent objectives. Progress resets every Monday.',fr:'Terminez 5 objectifs indépendants. La progression repart chaque lundi.',es:'Completa 5 objetivos independientes. El progreso se reinicia cada lunes.'},
   pass_weekly_reset_in: {it:'RESET TRA {time}',en:'RESET IN {time}',fr:'RÉINITIALISATION DANS {time}',es:'REINICIO EN {time}'},
   pass_weekly_time_format: {it:'{days}g {hours}h',en:'{days}d {hours}h',fr:'{days}j {hours}h',es:'{days}d {hours}h'},
-  pass_weekly_reset_notice: {it:'Le missioni settimanali Halloween sono state rinnovate!',en:'Halloween weekly missions have reset!',fr:'Les missions hebdomadaires Halloween ont été renouvelées !',es:'¡Se han renovado las misiones semanales de Halloween!'},
+  pass_weekly_reset_notice: {it:'Le missioni settimanali autunnali sono state rinnovate!',en:'Autumn weekly missions have reset!',fr:'Les missions hebdomadaires d’automne ont été renouvelées !',es:'¡Se han renovado las misiones semanales de otoño!'},
   pass_weekly_claim: {it:'RISCATTA EXP',en:'CLAIM EXP',fr:'RÉCUPÉRER EXP',es:'RECLAMAR EXP'},
   pass_weekly_claimed: {it:'RISCATTATA ✓',en:'CLAIMED ✓',fr:'RÉCUPÉRÉE ✓',es:'RECLAMADA ✓'},
   pass_weekly_progress: {it:'PROGRESSO',en:'PROGRESS',fr:'PROGRESSION',es:'PROGRESO'},
@@ -595,9 +804,17 @@ const HALLOWEEN_PASS_I18N = {
   pass_weekly_not_done: {it:'Completa prima la missione settimanale.',en:'Complete the weekly mission first.',fr:'Terminez d’abord la mission hebdomadaire.',es:'Completa primero la misión semanal.'},
   pass_weekly_already_claimed: {it:'Ricompensa settimanale già riscattata.',en:'Weekly reward already claimed.',fr:'Récompense hebdomadaire déjà récupérée.',es:'La recompensa semanal ya fue reclamada.'},
   pass_weekly_claim_success: {it:'Missione settimanale riscattata: +{exp} EXP e +{yen} ¥!',en:'Weekly mission claimed: +{exp} EXP and +{yen} ¥!',fr:'Mission hebdomadaire récupérée : +{exp} EXP et +{yen} ¥ !',es:'Misión semanal reclamada: ¡+{exp} EXP y +{yen} ¥!'},
-  pass_season_note: {it:'Stagione Halloween locale • progressi salvati in questo browser.',en:'Local Halloween season • progress saved in this browser.',fr:'Saison Halloween locale • progression enregistrée dans ce navigateur.',es:'Temporada local de Halloween • progreso guardado en este navegador.'},
+  pass_season_note: {it:'Stagione autunnale locale • progressi salvati in questo browser.',en:'Local Autumn season • progress saved in this browser.',fr:'Saison automnale locale • progression enregistrée dans ce navigateur.',es:'Temporada local de otoño • progreso guardado en este navegador.'},
   pass_no_reward: {it:'Questo tier non contiene una ricompensa premium.',en:'This tier has no premium reward.',fr:'Ce palier ne contient aucune récompense premium.',es:'Este nivel no contiene recompensa premium.'},
-  pass_reward_unavailable: {it:'Ricompensa temporaneamente non disponibile.',en:'Reward temporarily unavailable.',fr:'Récompense temporairement indisponible.',es:'Recompensa temporalmente no disponible.'}
+  pass_reward_unavailable: {it:'Ricompensa temporaneamente non disponibile.',en:'Reward temporarily unavailable.',fr:'Récompense temporairement indisponible.',es:'Recompensa temporalmente no disponible.'},
+  pass_item_no_sell: {it:'Oggetto del Battle Pass: non può essere venduto.',en:'Battle Pass item: it cannot be sold.',fr:'Objet du Battle Pass : vente impossible.',es:'Objeto del Battle Pass: no se puede vender.'},
+  pass_item_tag: {it:'PASS',en:'PASS',fr:'PASS',es:'PASS'},
+  pass_reset_title: {it:'CICLO COMPLETATO',en:'CYCLE COMPLETE',fr:'CYCLE TERMINÉ',es:'CICLO COMPLETADO'},
+  pass_reset_desc: {it:'Hai raggiunto il livello 30 e riscattato tutte le ricompense disponibili. Puoi ricominciare il Pass: Premium resta attivo.',en:'You reached level 30 and claimed every available reward. Start a new Pass cycle; Premium remains active.',fr:'Vous avez atteint le niveau 30 et récupéré toutes les récompenses disponibles. Relancez le Pass ; Premium reste actif.',es:'Has llegado al nivel 30 y reclamado todas las recompensas disponibles. Reinicia el ciclo; Premium seguirá activo.'},
+  pass_reset_button: {it:'↻ RESETTA PASS',en:'↻ RESET PASS',fr:'↻ RÉINITIALISER LE PASS',es:'↻ REINICIAR PASE'},
+  pass_reset_confirm: {it:'Hai completato tutte le ricompense disponibili. Vuoi ricominciare il Battle Pass dal livello 1? Yen, inventario, missioni settimanali e Premium resteranno attivi.',en:'You claimed all available rewards. Restart the Battle Pass from level 1? Yen, inventory, weekly missions and Premium access will be preserved.',fr:'Vous avez récupéré toutes les récompenses disponibles. Recommencer le Battle Pass au niveau 1 ? Les yens, l’inventaire, les missions hebdomadaires et Premium seront conservés.',es:'Has reclamado todas las recompensas disponibles. ¿Reiniciar el Battle Pass desde el nivel 1? Se conservarán los Yen, el inventario, las misiones semanales y Premium.'},
+  pass_reset_success: {it:'Battle Pass riavviato! Livello 1, 0 EXP. Premium ancora attivo.',en:'Battle Pass restarted! Level 1, 0 EXP. Premium is still active.',fr:'Battle Pass relancé ! Niveau 1, 0 EXP. Premium reste actif.',es:'¡Battle Pass reiniciado! Nivel 1, 0 EXP. Premium sigue activo.'},
+  pass_reset_not_ready: {it:'Prima raggiungi il livello 30 e riscatta tutte le ricompense disponibili.',en:'Reach level 30 and claim every available reward first.',fr:'Atteignez le niveau 30 et récupérez toutes les récompenses disponibles.',es:'Primero alcanza el nivel 30 y reclama todas las recompensas disponibles.'}
 };
 
 function translateGameText(value) {
@@ -672,7 +889,7 @@ function applyLanguageStrings() {
     const ids = {menuBtn:'menu',shopBtn:'shop',invBtn:'inventory',questBtn:'quests',adminBtn:'admin',logoutBtn:'logout',languageBtn:'language',languageTitle:'languageTitle',languageDescription:'languageDescription',blueTeamLabel:'blue',redTeamLabel:'red'};
     Object.entries(ids).forEach(([id,key]) => { const el=document.getElementById(id); if(el && t[key]) el.textContent=t[key]; });
     const halloweenPassButton = document.getElementById('halloweenPassBtn');
-    if (halloweenPassButton) halloweenPassButton.textContent = '🎃 ' + translateGameText('pass_halloween_title');
+    if (halloweenPassButton) halloweenPassButton.textContent = '🍂 ' + translateGameText('pass_halloween_title');
     const saveBtnText = {it:'💾 SALVATAGGI',en:'💾 SAVE DATA',fr:'💾 SAUVEGARDES',es:'💾 GUARDADOS'}[gameLanguage] || '💾 SAVE DATA';
     const saveDataButton = document.getElementById('saveDataBtn'); if(saveDataButton) saveDataButton.textContent = saveBtnText;
     const loginTitle=document.querySelector('.login-box h2'); if(loginTitle) loginTitle.textContent=t.loginTitle;
@@ -762,6 +979,13 @@ let userFlowSpins = Number.isFinite(_savedFlowSpins) && _savedFlowSpins >= 0 ? _
 let userLuckyStyleSpins = parseInt(storage.getItem('egoist_lucky_style_spins'), 10) || 0;
 let userLuckyFlowSpins = parseInt(storage.getItem('egoist_lucky_flow_spins'), 10) || 0;
 let hasSkipPass = storage.getItem('egoist_skip_pass') === 'true';
+// V7.7.20: ownership is persistent and separate from the Settings ON/OFF toggle.
+let hasSkipPassPurchased = storage.getItem('egoist_skip_pass_purchased') === 'true';
+// Migrate existing saves that already had Skip Pass enabled.
+if (hasSkipPass && !hasSkipPassPurchased) {
+    hasSkipPassPurchased = true;
+    storage.setItem('egoist_skip_pass_purchased', 'true');
+}
 
 let stylePity = parseInt(storage.getItem('egoist_style_pity'), 10) || 0;
 let flowPity = parseInt(storage.getItem('egoist_flow_pity'), 10) || 0;
@@ -774,8 +998,7 @@ let styleTargetBonuses = (() => {
 let selectedSecretPityStyle = storage.getItem('egoist_selected_secret_pity_style') || 'destroyer';
 let selectedSecretPityFlow = storage.getItem('egoist_selected_secret_pity_flow') || 'predator';
 let stylePityPickerOpen = false;
-let flowPityPickerOpen = false;
-let luckyOddsModalOpen = false;
+let flowPityPickerOpen = false;let luckyOddsModalOpen = false;
 let luckyOddsTab = 'style';
 let flowTargetBonuses = (() => {
     const saved = readJSON('egoist_flow_target_bonuses', {});
@@ -1121,6 +1344,382 @@ updateYenDisplay();
 updateSpinsDisplay();
 
 let gameState = 'menu';
+
+// ================================================================
+// V7.7.20 — LAN MULTIPLAYER UI / BROWSER PREVIEW
+// Browser builds only preview the flow. Real sockets are provided by
+// an optional Electron preload bridge (window.lanBridge).
+// ================================================================
+let lanState = {
+    role: null,                    // 'host' | 'client' | null
+    mode: 'idle',                  // idle | hosting | connecting | connected | error | preview
+    hostPort: 7777,
+    localIPs: [],
+    peers: [],
+    errorMessage: '',
+    joinIP: '192.168.1.',
+    ipEditing: false
+};
+
+function getLANBridge() {
+    if (typeof window === 'undefined' || !window.lanBridge) return null;
+    try {
+        const bridge = window.lanBridge;
+        if (typeof bridge.isAvailable === 'function' && !bridge.isAvailable()) return null;
+        return bridge;
+    } catch (_) {
+        return null;
+    }
+}
+function isLANAvailable() {
+    return getLANBridge() !== null;
+}
+function lanIsValidIPv4(value) {
+    const ip = String(value || '').trim();
+    if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) return false;
+    return ip.split('.').every(part => Number(part) >= 0 && Number(part) <= 255);
+}
+function openLANMenu() {
+    gameState = 'lanMenu';
+    lanState.role = null;
+    lanState.mode = 'idle';
+    lanState.errorMessage = '';
+    lanState.peers = [];
+    lanState.ipEditing = false;
+}
+function lanBackToMenu() {
+    const bridge = getLANBridge();
+    if (bridge) {
+        try { if (typeof bridge.disconnect === 'function') bridge.disconnect(); } catch (_) {}
+        try { if (typeof bridge.stopHost === 'function') bridge.stopHost(); } catch (_) {}
+    }
+    lanState.role = null;
+    lanState.mode = 'idle';
+    lanState.peers = [];
+    lanState.errorMessage = '';
+    lanState.ipEditing = false;
+    gameState = 'menu';
+}
+async function lanStartHost() {
+    lanState.role = 'host';
+    lanState.errorMessage = '';
+    lanState.peers = [];
+    const bridge = getLANBridge();
+    if (!bridge || typeof bridge.startHost !== 'function') {
+        // Browser preview: use a loopback placeholder, not a real LAN address.
+        lanState.mode = 'preview';
+        lanState.localIPs = ['127.0.0.1'];
+        gameState = 'lanHost';
+        return;
+    }
+    lanState.mode = 'hosting';
+    gameState = 'lanHost';
+    try {
+        const result = await bridge.startHost(lanState.hostPort);
+        if (result && result.ok) {
+            lanState.localIPs = Array.isArray(result.localIPs) ? result.localIPs : [];
+            if (typeof bridge.on === 'function') {
+                bridge.on('peer-joined', peer => {
+                    if (!lanState.peers.some(p => p.id === peer.id)) {
+                        lanState.peers.push({
+                            id: peer.id,
+                            name: peer.name || 'Player',
+                            team: peer.team || 'red',
+                            ready: !!peer.ready
+                        });
+                    }
+                });
+                bridge.on('peer-left', peer => {
+                    lanState.peers = lanState.peers.filter(p => p.id !== peer.id);
+                });
+                bridge.on('peer-ready', peer => {
+                    const found = lanState.peers.find(p => p.id === peer.id);
+                    if (found) found.ready = !!peer.ready;
+                });
+            }
+        } else {
+            lanState.mode = 'error';
+            lanState.errorMessage = (result && result.error) || 'Impossibile avviare l’host.';
+        }
+    } catch (error) {
+        lanState.mode = 'error';
+        lanState.errorMessage = String((error && error.message) || error);
+    }
+}
+async function lanStopHost() {
+    const bridge = getLANBridge();
+    if (bridge && typeof bridge.stopHost === 'function') {
+        try { await bridge.stopHost(); } catch (_) {}
+    }
+    lanState.role = null;
+    lanState.mode = 'idle';
+    lanState.peers = [];
+    lanState.errorMessage = '';
+    gameState = 'lanMenu';
+}
+async function lanConnect() {
+    const ip = String(lanState.joinIP || '').trim();
+    if (!lanIsValidIPv4(ip)) {
+        lanState.mode = 'error';
+        lanState.errorMessage = 'Inserisci un indirizzo IPv4 valido (es. 192.168.1.42).';
+        return;
+    }
+    const bridge = getLANBridge();
+    if (!bridge || typeof bridge.connect !== 'function') {
+        lanState.mode = 'preview';
+        lanState.errorMessage = 'Anteprima browser: networking reale disponibile solo nella versione desktop (.exe).';
+        return;
+    }
+    lanState.mode = 'connecting';
+    lanState.errorMessage = '';
+    try {
+        const result = await bridge.connect(ip, lanState.hostPort);
+        if (result && result.ok) {
+            lanState.mode = 'connected';
+            lanState.role = 'client';
+            gameState = 'lanLobby';
+        } else {
+            lanState.mode = 'error';
+            lanState.errorMessage = (result && result.error) || 'Connessione fallita.';
+        }
+    } catch (error) {
+        lanState.mode = 'error';
+        lanState.errorMessage = String((error && error.message) || error);
+    }
+}
+
+function drawLANBackButton() {
+    const hot = mouseX >= 35 && mouseX <= 193 && mouseY >= 25 && mouseY <= 65;
+    fillRoundRect(ctx, 35, 25, 158, 40, 8,
+        hot ? 'rgba(53,246,255,.18)' : 'rgba(255,255,255,.06)',
+        hot ? '#35F6FF' : 'rgba(255,255,255,.28)', hot ? 1.8 : 1.1);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.font = '800 17px "Teko", "Bahnschrift SemiCondensed", sans-serif';
+    ctx.fillText('◄ MENU', 114, 51);
+}
+function drawLANInfoBanner(y) {
+    if (isLANAvailable()) return;
+    const bw = 820, bh = 60, cx = canvas.width / 2;
+    fillRoundRect(ctx, cx - bw / 2, y, bw, bh, 8,
+        'rgba(255,140,0,.12)', '#FF8C00', 1.4);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFC966';
+    ctx.font = '800 14px "Rajdhani", sans-serif';
+    ctx.fillText('⚠ ANTEPRIMA BROWSER — il networking reale non è attivo in questa versione.', cx, y + 24, bw - 20);
+    ctx.fillStyle = '#FFB366';
+    ctx.font = '600 12px "Rajdhani", sans-serif';
+    ctx.fillText('Puoi provare i menu; nessun socket o collegamento Wi-Fi viene aperto.', cx, y + 44, bw - 20);
+}
+function drawLANErrorBanner(y) {
+    if (!lanState.errorMessage) return;
+    const bw = 820, bh = 50, cx = canvas.width / 2;
+    fillRoundRect(ctx, cx - bw / 2, y, bw, bh, 8, 'rgba(255,60,60,.14)', '#FF3C3C', 1.4);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFB0B0';
+    ctx.font = '700 13px "Rajdhani", sans-serif';
+    ctx.fillText(lanState.errorMessage, cx, y + 30, bw - 24);
+}
+function drawLANBigButton(x, y, w, h, label, sub, color, disabled = false) {
+    const hot = !disabled && mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+    const tint = disabled ? '#4A5268' : color;
+    const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+    grad.addColorStop(0, hot ? tint + '40' : 'rgba(17,21,31,.98)');
+    grad.addColorStop(1, 'rgba(4,5,10,.99)');
+    fillRoundRect(ctx, x, y, w, h, 9, grad, hot ? tint : tint + '99', hot ? 2.2 : 1.3);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = disabled ? '#758097' : (hot ? '#FFFFFF' : tint);
+    ctx.font = '800 30px "Teko", sans-serif';
+    ctx.fillText(label, x + w / 2, y + h / 2 + (sub ? -4 : 10), w - 40);
+    if (sub) {
+        ctx.fillStyle = hot ? '#E0F4FF' : '#8FA0BE';
+        ctx.font = '600 12px "Rajdhani", sans-serif';
+        ctx.fillText(sub, x + w / 2, y + h / 2 + 22, w - 30);
+    }
+}
+function drawLANPeerRow(x, y, w, h, name, team, ready, isHost) {
+    fillRoundRect(ctx, x, y, w, h, 7, 'rgba(17,22,38,.94)',
+        ready ? '#00FF9D' : 'rgba(255,255,255,.14)', ready ? 1.6 : 1);
+    const teamColor = team === 'red' ? '#FF3158' : '#35F6FF';
+    fillRoundRect(ctx, x + 12, y + h / 2 - 12, 24, 24, 5, teamColor + '30', teamColor, 1.1);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = teamColor;
+    ctx.font = '800 15px "Teko", sans-serif';
+    ctx.fillText(isHost ? '★' : (team === 'red' ? 'R' : 'B'), x + 24, y + h / 2 + 5);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#F2F7FF';
+    ctx.font = '700 16px "Rajdhani", sans-serif';
+    ctx.fillText(name, x + 48, y + h / 2 + 6, w - 180);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = ready ? '#00FF9D' : '#8FA0BE';
+    ctx.font = '800 12px "Rajdhani", sans-serif';
+    ctx.fillText(ready ? '✓ PRONTO' : 'IN ATTESA', x + w - 16, y + h / 2 + 4);
+}
+function beginLANScreenFrame() {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawStadium();
+    drawPitchDesign();
+    ctx.fillStyle = 'rgba(3,8,16,.96)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+function drawLANMenuScreen() {
+    beginLANScreenFrame();
+    const cx = canvas.width / 2;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00FF9D';
+    ctx.font = '700 15px "Rajdhani", sans-serif';
+    ctx.fillText('MULTIPLAYER • LOCAL AREA NETWORK', cx, 70);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 58px "Teko", sans-serif';
+    ctx.fillText('LAN GAME', cx, 128);
+    drawLANInfoBanner(150);
+    drawLANBigButton(cx - 190, 240, 380, 100, '⌂ HOST', 'Crea una lobby sulla tua rete locale', '#00FF9D');
+    drawLANBigButton(cx - 190, 360, 380, 100, '↗ JOIN', 'Connettiti a una lobby esistente', '#35F6FF');
+    drawLANErrorBanner(500);
+    drawLANBackButton();
+    ctx.restore();
+}
+function drawLANHostScreen() {
+    beginLANScreenFrame();
+    const cx = canvas.width / 2;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00FF9D';
+    ctx.font = '700 15px "Rajdhani", sans-serif';
+    ctx.fillText('HOSTING • IN ATTESA DI GIOCATORI', cx, 60);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 52px "Teko", sans-serif';
+    ctx.fillText('LOBBY LAN', cx, 112);
+
+    const cardW = 720, cardH = 100, cardX = cx - cardW / 2, cardY = 140;
+    fillRoundRect(ctx, cardX, cardY, cardW, cardH, 9, 'rgba(10,20,34,.96)', '#00FF9D', 1.6);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#7FEFC0';
+    ctx.font = '800 12px "Rajdhani", sans-serif';
+    ctx.fillText('INDIRIZZO IP DA COMUNICARE', cardX + 20, cardY + 24);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '800 26px "Teko", monospace';
+    const ipLabel = lanState.localIPs.length
+        ? `${lanState.localIPs[0]}:${lanState.hostPort}`
+        : `— porta ${lanState.hostPort}`;
+    ctx.fillText(ipLabel, cardX + 20, cardY + 60);
+    ctx.fillStyle = '#8FA0BE';
+    ctx.font = '600 12px "Rajdhani", sans-serif';
+    ctx.fillText(lanState.mode === 'preview'
+        ? '⚠ Anteprima: questo indirizzo è solo dimostrativo, non raggiungibile dagli altri PC.'
+        : `Porta ${lanState.hostPort} • TCP • Rete locale`, cardX + 20, cardY + 84);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#AAB6D0';
+    ctx.font = '800 14px "Rajdhani", sans-serif';
+    ctx.fillText(`GIOCATORI — ${1 + lanState.peers.length}/4`, cardX, 275);
+    drawLANPeerRow(cardX, 290, cardW, 48, 'TU (HOST)', 'blue', true, true);
+    let rowY = 346;
+    for (const peer of lanState.peers.slice(0, 3)) {
+        drawLANPeerRow(cardX, rowY, cardW, 48, peer.name || 'Player',
+            peer.team || 'red', !!peer.ready, false);
+        rowY += 56;
+    }
+    const canStart = lanState.peers.length >= 1 && lanState.peers.every(peer => peer.ready);
+    drawLANBigButton(cx - 380, 580, 340, 70, '▶ AVVIA PARTITA',
+        canStart ? 'Tutti pronti!' : 'Serve almeno un giocatore pronto',
+        '#00FF9D', !canStart || lanState.mode === 'preview');
+    drawLANBigButton(cx + 40, 580, 340, 70, '⏹ CHIUDI HOST',
+        'Interrompi la lobby', '#FF3C3C');
+    drawLANErrorBanner(660);
+    drawLANBackButton();
+    ctx.restore();
+}
+function drawLANJoinScreen() {
+    beginLANScreenFrame();
+    const cx = canvas.width / 2;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#35F6FF';
+    ctx.font = '700 15px "Rajdhani", sans-serif';
+    ctx.fillText('JOIN • CONNESSIONE A UNA LOBBY ESISTENTE', cx, 70);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 52px "Teko", sans-serif';
+    ctx.fillText('INSERISCI IP HOST', cx, 128);
+
+    const fieldW = 600, fieldH = 80, fieldX = cx - fieldW / 2, fieldY = 210;
+    fillRoundRect(ctx, fieldX, fieldY, fieldW, fieldH, 9, 'rgba(10,20,34,.96)',
+        lanState.ipEditing ? '#FFD45A' : '#35F6FF', lanState.ipEditing ? 2.4 : 1.5);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#8FA0BE';
+    ctx.font = '800 11px "Rajdhani", sans-serif';
+    ctx.fillText('INDIRIZZO IP (IPv4)', fieldX + 20, fieldY + 22);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '800 34px "Teko", monospace';
+    const cursor = lanState.ipEditing && Math.floor(pantherAnimFrame / 30) % 2 === 0 ? '|' : '';
+    ctx.fillText(lanState.joinIP + cursor, fieldX + 20, fieldY + 62);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#7F8FA8';
+    ctx.font = '600 11px "Rajdhani", sans-serif';
+    ctx.fillText(lanState.ipEditing
+        ? 'INVIO = CONNETTI · ESC = ANNULLA'
+        : 'CLICCA SUL CAMPO PER MODIFICARE', fieldX + fieldW - 16, fieldY + 62);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#AAB6D0';
+    ctx.font = '700 16px "Rajdhani", sans-serif';
+    ctx.fillText(`Porta: ${lanState.hostPort}  (default 7777)`, cx, fieldY + fieldH + 30);
+    const canConnect = !lanState.ipEditing && lanIsValidIPv4(lanState.joinIP);
+    drawLANBigButton(cx - 190, 400, 380, 80, '↗ CONNETTI',
+        canConnect ? '' : 'Inserisci un IPv4 valido',
+        canConnect ? '#00FF9D' : '#4A5268', !canConnect);
+    if (lanState.mode === 'connecting') {
+        ctx.fillStyle = '#FFD45A';
+        ctx.font = '800 18px "Teko", sans-serif';
+        ctx.fillText('● CONNESSIONE IN CORSO…', cx, 520);
+    }
+    drawLANErrorBanner(540);
+    drawLANInfoBanner(600);
+    drawLANBackButton();
+    ctx.restore();
+}
+function drawLANLobbyScreen() {
+    beginLANScreenFrame();
+    const cx = canvas.width / 2, cardW = 720, cardX = cx - 360;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00FF9D';
+    ctx.font = '700 15px "Rajdhani", sans-serif';
+    ctx.fillText('LOBBY • CONNESSO', cx, 60);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 52px "Teko", sans-serif';
+    ctx.fillText('SALA D’ATTESA', cx, 112);
+    const hostPeer = lanState.peers.find(peer => peer.isHost) || {
+        name: 'Host', team: 'blue', ready: true
+    };
+    drawLANPeerRow(cardX, 160, cardW, 48, hostPeer.name || 'Host',
+        hostPeer.team || 'blue', true, true);
+    let rowY = 216;
+    for (const peer of lanState.peers.filter(peer => !peer.isHost).slice(0, 3)) {
+        drawLANPeerRow(cardX, rowY, cardW, 48, peer.name || 'Player',
+            peer.team || 'red', !!peer.ready, false);
+        rowY += 56;
+    }
+    const isHost = lanState.role === 'host';
+    if (isHost) {
+        const canStart = lanState.peers.filter(peer => !peer.isHost).length > 0 &&
+            lanState.peers.every(peer => peer.ready || peer.isHost);
+        drawLANBigButton(cx - 380, 500, 340, 70, '▶ AVVIA PARTITA',
+            canStart ? 'Tutti pronti' : 'Attendi i giocatori',
+            canStart ? '#00FF9D' : '#4A5268', !canStart);
+        drawLANBigButton(cx + 40, 500, 340, 70, '⏹ CHIUDI LOBBY',
+            'Torna al menu', '#FF3C3C');
+    } else {
+        const me = lanState.peers.find(peer => peer.isSelf);
+        const ready = !!(me && me.ready);
+        drawLANBigButton(cx - 380, 500, 340, 70, ready ? '✓ PRONTO' : '◯ PRONTO',
+            'Comunica all’host', ready ? '#00FF9D' : '#35F6FF');
+        drawLANBigButton(cx + 40, 500, 340, 70, '◄ ESCI',
+            'Abbandona la lobby', '#FF3C3C');
+    }
+    drawLANErrorBanner(600);
+    drawLANBackButton();
+    ctx.restore();
+}
+
 const STADIUM_OPTIONS = [
     { id: 'worldCup', name: 'WORLD CUP ARENA', scoreboardLabel: 'WORLD CUP ARENA • GRANDE FINALE', short: 'WORLD CUP', subtitle: 'La finale mondiale', description: 'Tribune dorate, luci da finale internazionale e prato classico.', accent: '#FFD45A', secondary: '#53D49A', fieldPalettes: [['#10392A', '#071F18'], ['#12412F', '#08271D']] },
     { id: 'neonNexus', name: 'NEON NEXUS', scoreboardLabel: 'NEON NEXUS • TOKYO NIGHT', short: 'NEON NEXUS', subtitle: 'Metropoli cyberpunk', description: 'Anelli al neon, LED viola e gradinate futuristiche.', accent: '#42F5FF', secondary: '#B45CFF', fieldPalettes: [['#123D52', '#071A2B'], ['#174C62', '#0A2539']] },
@@ -1398,8 +1997,7 @@ function loadRealKingMastery() {
 }
 let realKingMastery = loadRealKingMastery();
 let realKingUnlockAnimTimer = 0;
-function saveRealKingMastery() {
-    storage.setItem(`real_king_mastery_${loggedUser || 'guest'}`, JSON.stringify(realKingMastery));
+function saveRealKingMastery() {    storage.setItem(`real_king_mastery_${loggedUser || 'guest'}`, JSON.stringify(realKingMastery));
 }
 function isRealKingMasteryUnlocked() { return !!(realKingMastery && realKingMastery.unlocked); }
 function ownsKingStyleForMastery() {
@@ -2399,7 +2997,6 @@ function savePreferences() {
     storage.setItem('egoist_max_flow_slots', maxFlowSlots);
     storage.setItem('egoist_equipped_flow_slots', JSON.stringify(equippedFlowSlots));
     storage.setItem('egoist_active_flow_slot', activeFlowSlotIndex);
-
     if (masteryStyleEquipped && !isDemonKingUnlocked()) {
         masteryStyleEquipped = false;
         storage.setItem('egoist_mastery_equipped', 'false');
@@ -3398,8 +3995,7 @@ function startKaiserImpact() {
     if (!adminNoCooldownEnabled && kaiserImpactCooldown > 0) {
         showNotification(`KAISER IMPACT IN RICARICA: ${(kaiserImpactCooldown / 60).toFixed(1)}s`);
         return false;
-    }
-    const distToBall = Math.hypot(ball.x - player.x, ball.y - player.y);
+    }    const distToBall = Math.hypot(ball.x - player.x, ball.y - player.y);
     if ((ball.owner && ball.owner !== player) || (!ball.owner && distToBall > 92)) {
         showNotification(ball.owner && ball.owner !== player
             ? 'KAISER IMPACT: LA PALLA NON È TUA!'
@@ -4398,8 +4994,7 @@ function drawChameleonRefTongue(ctx, baseX, baseY, extension, wobble, color) {
   ctx.restore();
 }
 
-function drawChameleonRefSprite(ctx, x, y, scale, alpha, awakened, t, tongueExt, facing) {
-  facing = facing || 1; // 1 = destra, -1 = sinistra
+function drawChameleonRefSprite(ctx, x, y, scale, alpha, awakened, t, tongueExt, facing) {  facing = facing || 1; // 1 = destra, -1 = sinistra
   tongueExt = tongueExt === undefined ? 0 : tongueExt;
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -5398,8 +5993,7 @@ function emitSharkVfxParticle(cfg) {
     if (sharkVfxParticles.length >= poolLimit) sharkVfxParticles.splice(0, sharkVfxParticles.length - poolLimit + 1);
     const life = Math.max(1, cfg.life || 24);
     sharkVfxParticles.push({
-        x: cfg.x || 0, y: cfg.y || 0, vx: cfg.vx || 0, vy: cfg.vy || 0,
-        drag: cfg.drag ?? .94, r: cfg.r || 2, rEnd: cfg.rEnd ?? .25,
+        x: cfg.x || 0, y: cfg.y || 0, vx: cfg.vx || 0, vy: cfg.vy || 0,        drag: cfg.drag ?? .94, r: cfg.r || 2, rEnd: cfg.rEnd ?? .25,
         life, maxLife: life, color: cfg.color || '#3B82F6', shape: cfg.shape || 'circle',
         angle: cfg.angle || 0, angleV: cfg.angleV || 0, glow: cfg.glow ?? true
     });
@@ -6398,8 +6992,7 @@ function startNewgenCelestialDestruction() {
         }
     });
 
-    pushNewgenAfterimages(sx, sy, tx, ty, angle, 25);
-    player.x = tx; player.y = ty; player.vx = 0; player.vy = 0;
+    pushNewgenAfterimages(sx, sy, tx, ty, angle, 25);    player.x = tx; player.y = ty; player.vx = 0; player.vy = 0;
     player.isDashing = false;
     untouchableTimer = Math.max(untouchableTimer, 26); // I-frames while cutting through pressure.
     celestialDestructionTimer = 19; // short camera punch / motion emphasis
@@ -6635,7 +7228,11 @@ const GOAL_EXPLOSION_VFX = [
     { id: 'prism', name: 'Prism Shockwave', color: '#E040FB', kind: 8 },
     { id: 'confetti', name: 'Champion Confetti', color: '#54D18A', kind: 9 },
     { id: 'pumpkinBlast', name: 'Pumpkin Blast', color: '#FF7A00', kind: 10, halloween: true },
-    { id: 'ghostPortal', name: 'Ghost Portal', color: '#B47AFF', kind: 11, halloween: true }
+    { id: 'ghostPortal', name: 'Ghost Portal', color: '#B47AFF', kind: 11, halloween: true },
+    { id: 'leafBurst', name: 'Leaf Burst', color: '#E8631A', kind: 12, halloween: true, autumn: true },
+    { id: 'amberSwirl', name: 'Amber Swirl', color: '#F2B705', kind: 13, halloween: true, autumn: true },
+    { id: 'leafStorm', name: 'Leaf Storm', color: '#B31E22', kind: 14, halloween: true, autumn: true },
+    { id: 'harvestRune', name: 'Harvest Rune', color: '#8B5A2B', kind: 15, halloween: true, autumn: true }
 ];
 let ownedGoalVfx = readJSON('egoist_goal_vfx_owned', []);
 if (!Array.isArray(ownedGoalVfx)) ownedGoalVfx = [];
@@ -6689,7 +7286,7 @@ function updateGoalExplosionVfx() {
 function drawGoalExplosionVfx() {
     const fx = goalExplosionFx;
     if (!fx || !gameSettings.particlesEnabled) return;
-    if (fx.id === 'pumpkinBlast' || fx.id === 'ghostPortal') { drawHalloweenGoalExplosion(fx); return; }
+    if (fx.kind >= 10 && fx.kind <= 15) { drawHalloweenGoalExplosion(fx); return; }
     const t = Math.min(1, fx.age / fx.life), fade = Math.pow(1 - t, .8);
     const ease = 1 - Math.pow(1 - t, 2.25), r = 18 + ease * 250;
     const x = fx.x, y = fx.y, c = fx.color;
@@ -7394,8 +7991,7 @@ function updateRealKingUltimate() {
         target.stunTimer = 0; target.lazyFakeStunned = false; target.isSliding = false;
         if (enemyGk) {
             enemyGk.x = a.goalX - a.dir * 8; enemyGk.y = a.goalY;
-            enemyGk.stunTimer = 100; enemyGk.vx = enemyGk.vy = 0;
-        }
+            enemyGk.stunTimer = 100; enemyGk.vx = enemyGk.vy = 0;        }
         clearSpecialShot();
         realKingUltimateAnim = null;
         triggerGoalCelebration(a.team);
@@ -8394,8 +8990,7 @@ function botBrain(bot) {
                 tx = ball.x + ball.vx * leadFrames; ty = ball.y + ball.vy * leadFrames; spd *= 1.16;
             } else {
                 // A second player shades the expected outlet instead of all four bots chasing the same ball.
-                tx = home.x + (ball.x - home.x) * 0.26;
-                ty = home.y + (ball.y - home.y) * 0.20;
+                tx = home.x + (ball.x - home.x) * 0.26;                ty = home.y + (ball.y - home.y) * 0.20;
             }
         } else if (bot.aiState === 'pressing' || bot.aiState === 'covering' || bot.aiState === 'marking') {
             const c = ball.owner;
@@ -9394,8 +9989,7 @@ function hudChip(x, y, w, h, key, label, state, ratio, col) {
     ctx.textBaseline = 'middle';
     ctx.fillText(keyText, x + 4 + badgeW / 2, y + h / 2, badgeW - 3);
 
-    // Abbreviated label + compact status
-    const tx = x + 6 + badgeW + 5;
+    // Abbreviated label + compact status    const tx = x + 6 + badgeW + 5;
     const tw = Math.max(20, w - badgeW - 16);
     ctx.textAlign = 'left';
     ctx.fillStyle = '#e7eef7';
@@ -10075,6 +10669,31 @@ function toggleQuickMute() {
 window.addEventListener('keydown', e => {
     if (!e.key) return;
 
+    // V7.7.20: inline IPv4 editing on the LAN Join screen.
+    if (gameState === 'lanJoin' && lanState.ipEditing) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (e.key === 'Enter') {
+            lanState.ipEditing = false;
+            lanConnect();
+            return;
+        }
+        if (e.key === 'Escape') {
+            lanState.ipEditing = false;
+            return;
+        }
+        if (e.key === 'Backspace') {
+            lanState.joinIP = lanState.joinIP.slice(0, -1);
+            lanState.errorMessage = '';
+            return;
+        }
+        if (/^[0-9.]$/.test(e.key) && lanState.joinIP.length < 15) {
+            lanState.joinIP += e.key;
+            lanState.errorMessage = '';
+        }
+        return;
+    }
+
     // V6.3 QoL: pause / resume / restart. Pause freezes update() without replacing the pitch scene.
     if (isPaused) {
         if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
@@ -10369,8 +10988,7 @@ window.addEventListener('keydown', e => {
         if (currentStyle.id === 'wind') {
             if (!adminNoCooldownEnabled) awakeningCooldown = 600; 
             let moveX = 0, moveY = 0;
-            if (keys[keyBindings.up] || keys['arrowup']) moveY = -1;
-            if (keys[keyBindings.down] || keys['arrowdown']) moveY = 1;
+            if (keys[keyBindings.up] || keys['arrowup']) moveY = -1;            if (keys[keyBindings.down] || keys['arrowdown']) moveY = 1;
             if (keys[keyBindings.left] || keys['arrowleft']) moveX = -1;
             if (keys[keyBindings.right] || keys['arrowright']) moveX = 1;
             let angle = (moveX !== 0 || moveY !== 0) ? Math.atan2(moveY, moveX) : Math.atan2(mouseY - player.y, mouseX - player.x);
@@ -10955,6 +11573,113 @@ canvas.addEventListener('mousedown', e => {
         return;
     }
 
+
+    // ===== V7.7.20 LAN SCREENS =====
+    if (gameState === 'lanMenu') {
+        if (e.button !== 0) return;
+        if (clickX >= 35 && clickX <= 193 && clickY >= 25 && clickY <= 65) {
+            lanBackToMenu(); return;
+        }
+        const cx = canvas.width / 2;
+        if (clickX >= cx - 190 && clickX <= cx + 190 && clickY >= 240 && clickY <= 340) {
+            lanStartHost(); return;
+        }
+        if (clickX >= cx - 190 && clickX <= cx + 190 && clickY >= 360 && clickY <= 460) {
+            lanState.ipEditing = false;
+            lanState.errorMessage = '';
+            lanState.mode = 'idle';
+            gameState = 'lanJoin';
+            return;
+        }
+        return;
+    }
+    if (gameState === 'lanHost') {
+        if (e.button !== 0) return;
+        if (clickX >= 35 && clickX <= 193 && clickY >= 25 && clickY <= 65) {
+            lanBackToMenu(); return;
+        }
+        const cx = canvas.width / 2;
+        if (clickX >= cx - 380 && clickX <= cx - 40 && clickY >= 580 && clickY <= 650) {
+            const canStart = lanState.peers.length >= 1 && lanState.peers.every(peer => peer.ready);
+            if (canStart && lanState.mode !== 'preview') {
+                const bridge = getLANBridge();
+                if (bridge && typeof bridge.startMatch === 'function') {
+                    try {
+                        bridge.startMatch();
+                        lanState.errorMessage = 'Avvio partita LAN richiesto all’host.';
+                    } catch (error) {
+                        lanState.errorMessage = String((error && error.message) || error);
+                    }
+                } else {
+                    lanState.errorMessage = 'Avvio LAN disponibile solo con il bridge desktop.';
+                }
+            } else {
+                lanState.errorMessage = lanState.mode === 'preview'
+                    ? 'Anteprima browser: il multiplayer reale richiede la versione desktop.'
+                    : 'Servono almeno un giocatore aggiuntivo e tutti pronti.';
+            }
+            return;
+        }
+        if (clickX >= cx + 40 && clickX <= cx + 380 && clickY >= 580 && clickY <= 650) {
+            lanStopHost(); return;
+        }
+        return;
+    }
+    if (gameState === 'lanJoin') {
+        if (e.button !== 0) return;
+        if (clickX >= 35 && clickX <= 193 && clickY >= 25 && clickY <= 65) {
+            lanBackToMenu(); return;
+        }
+        const cx = canvas.width / 2;
+        const fieldX = cx - 300, fieldY = 210;
+        if (clickX >= fieldX && clickX <= fieldX + 600 && clickY >= fieldY && clickY <= fieldY + 80) {
+            lanState.ipEditing = true;
+            lanState.errorMessage = '';
+            return;
+        }
+        if (clickX >= cx - 190 && clickX <= cx + 190 && clickY >= 400 && clickY <= 480) {
+            if (!lanState.ipEditing && lanIsValidIPv4(lanState.joinIP)) lanConnect();
+            return;
+        }
+        return;
+    }
+    if (gameState === 'lanLobby') {
+        if (e.button !== 0) return;
+        if (clickX >= 35 && clickX <= 193 && clickY >= 25 && clickY <= 65) {
+            lanBackToMenu(); return;
+        }
+        const cx = canvas.width / 2;
+        if (lanState.role === 'host') {
+            if (clickX >= cx - 380 && clickX <= cx - 40 && clickY >= 500 && clickY <= 570) {
+                const bridge = getLANBridge();
+                if (bridge && typeof bridge.startMatch === 'function') {
+                    try { bridge.startMatch(); lanState.errorMessage = 'Avvio partita LAN richiesto all’host.'; }
+                    catch (error) { lanState.errorMessage = String((error && error.message) || error); }
+                } else {
+                    lanState.errorMessage = 'Avvio LAN disponibile solo con il bridge desktop.';
+                }
+                return;
+            }
+            if (clickX >= cx + 40 && clickX <= cx + 380 && clickY >= 500 && clickY <= 570) {
+                lanBackToMenu(); return;
+            }
+        } else {
+            if (clickX >= cx - 380 && clickX <= cx - 40 && clickY >= 500 && clickY <= 570) {
+                const me = lanState.peers.find(peer => peer.isSelf);
+                if (me) {
+                    me.ready = !me.ready;
+                    const bridge = getLANBridge();
+                    if (bridge && typeof bridge.send === 'function') bridge.send('ready', { ready: me.ready });
+                }
+                return;
+            }
+            if (clickX >= cx + 40 && clickX <= cx + 380 && clickY >= 500 && clickY <= 570) {
+                lanBackToMenu(); return;
+            }
+        }
+        return;
+    }
+
     if (gameState === 'menu') {
         if (clickX >= canvas.width / 2 - 170 && clickX <= canvas.width / 2 - 10 && clickY >= 200 && clickY <= 240) {
             playerTeam = 'blue';
@@ -10981,6 +11706,8 @@ canvas.addEventListener('mousedown', e => {
             ensureRankedWeekCurrent(); rankedModeScroll = 0; rankedModeSelected = '5v5'; gameState = 'ranked';
         } else if (clickX >= centerX && clickX <= centerX + btnW && clickY >= 608 && clickY <= 650) {
             changelogTab = 'updates'; changelogScroll = 0; gameState = 'changelog';
+        } else if (clickX >= centerX && clickX <= centerX + btnW && clickY >= 652 && clickY <= 694) {
+            openLANMenu();
         }
         return;
     }
@@ -11260,8 +11987,7 @@ canvas.addEventListener('mousedown', e => {
                 const rowY = 214 + i * 62;
                 if (clickX >= pickerX + 24 && clickX <= pickerX + pickerW - 24 && clickY >= rowY && clickY <= rowY + 50) {
                     selectedSecretPityFlow = SECRET_PITY_FLOW_IDS[i];
-                    storage.setItem('egoist_selected_secret_pity_flow', selectedSecretPityFlow);
-                    flowPityPickerOpen = false;
+                    storage.setItem('egoist_selected_secret_pity_flow', selectedSecretPityFlow);                    flowPityPickerOpen = false;
                     showNotification(`PITY FLOW IMPOSTATA SU ${flows[selectedSecretPityFlow].name.toUpperCase()}!`);
                     return;
                 }
@@ -11350,7 +12076,16 @@ canvas.addEventListener('mousedown', e => {
         }
         if (clickX >= 78 && clickX <= 558 && clickY >= 202 && clickY <= 246) { gameSettings.particlesEnabled = !gameSettings.particlesEnabled; saveSettings(); return; }
         if (clickX >= 78 && clickX <= 558 && clickY >= 260 && clickY <= 304) { gameSettings.hudInfoEnabled = !gameSettings.hudInfoEnabled; saveSettings(); return; }
-        if (clickX >= 78 && clickX <= 558 && clickY >= 318 && clickY <= 362) { hasSkipPass = !hasSkipPass; storage.setItem('egoist_skip_pass', hasSkipPass ? 'true' : 'false'); showNotification(hasSkipPass ? 'SKIP SPIN ATTIVATO!' : 'SKIP SPIN DISATTIVATO!'); return; }
+        if (clickX >= 78 && clickX <= 558 && clickY >= 318 && clickY <= 362) {
+            if (!hasSkipPassPurchased) {
+                showNotification('DEVI ACQUISTARE IL PASSO SKIP DALLO SHOP (5.000 ¥)!');
+                return;
+            }
+            hasSkipPass = !hasSkipPass;
+            storage.setItem('egoist_skip_pass', hasSkipPass ? 'true' : 'false');
+            showNotification(hasSkipPass ? 'SKIP SPIN ATTIVATO!' : 'SKIP SPIN DISATTIVATO!');
+            return;
+        }
         if (clickX >= 478 && clickX <= 506 && clickY >= 384 && clickY <= 412) { gameSettings.volume = Math.max(0, gameSettings.volume - 10); saveSettings(); applyAudioVolumes(); return; }
         if (clickX >= 530 && clickX <= 558 && clickY >= 384 && clickY <= 412) { gameSettings.volume = Math.min(100, gameSettings.volume + 10); saveSettings(); applyAudioVolumes(); return; }
         if (clickX >= 78 && clickX <= 558 && clickY >= 376 && clickY <= 420) { audioSettingsOpen = true; return; }
@@ -11411,12 +12146,14 @@ canvas.addEventListener('mousedown', e => {
         }
 
         if (clickX >= 705 && clickX <= 1045 && clickY >= 180 && clickY <= 300) {
-            if (hasSkipPass) {
-                showNotification("HAI GIÀ ATTIVO IL PASSO SKIP!");
+            if (hasSkipPassPurchased) {
+                showNotification("HAI GIÀ ACQUISTATO IL PASSO SKIP!");
             } else if (userYen >= 5000) {
                 userYen -= 5000;
                 hasSkipPass = true;
+                hasSkipPassPurchased = true;
                 storage.setItem('egoist_skip_pass', 'true');
+                storage.setItem('egoist_skip_pass_purchased', 'true');
                 updateYenDisplay();
                 showNotification("PASSO SKIP SBLOCCATO CON SUCCESSO!");
             } else { showNotification("TI SERVONO 5.000 ¥ PER IL PASSO SKIP!"); }
@@ -11508,6 +12245,10 @@ canvas.addEventListener('mousedown', e => {
             const bx = startX + c * (boxSize + 16), by = startY + r * (boxSize + 16);
             if (clickX < bx || clickX > bx + boxSize || clickY < by || clickY > by + boxSize) return;
             const selling = (clickX >= bx + boxSize - 34 && clickX <= bx + boxSize && clickY >= by && clickY <= by + 24) || e.button === 2;
+            if (selling && isHalloweenPassRewardProtected(activeInventoryTab, item)) {
+                showNotification(hpT('pass_item_no_sell'));
+                return;
+            }
             if (activeInventoryTab === 'goalVfx') {
                 const effect = GOAL_EXPLOSION_VFX.find(v => v.id === item);
                 if (!effect) return;
@@ -12245,8 +12986,7 @@ function resetField() {
     assignSlots();
 
     bots.forEach(bot => {
-        bot.x = bot.initX; bot.y = bot.initY; bot.vx = 0; bot.vy = 0;
-        bot.isSliding = false; bot.stunTimer = 0; bot.iFrameTimer = 0; bot.perfectPassShieldTimer = 0; bot._matchDribbleActive = false; bot.slideCooldown = 0; bot.holdTimer = 0; bot.ballHoldFrames = 0; bot.gkCatchCooldown = 0;
+        bot.x = bot.initX; bot.y = bot.initY; bot.vx = 0; bot.vy = 0;        bot.isSliding = false; bot.stunTimer = 0; bot.iFrameTimer = 0; bot.perfectPassShieldTimer = 0; bot._matchDribbleActive = false; bot.slideCooldown = 0; bot.holdTimer = 0; bot.ballHoldFrames = 0; bot.gkCatchCooldown = 0;
         bot.hold = 0; bot.tackleCd = 0; bot.recvT = 0;
     });
 
@@ -12349,6 +13089,14 @@ function renderPlayerColor(x, y, radius, colorString, isStunned) {
 const HALLOWEEN_PASS_KEY = 'egoist_halloween_pass';
 const HALLOWEEN_QUEST_KEY = 'egoist_halloween_quests';
 const HALLOWEEN_WEEKLY_KEY = 'egoist_halloween_weekly_pass';
+// V7.7.23: perform one more one-time fresh start after the Autumn Pass reward rebalance.
+// Keep the established keys; preserve Yen, inventories and the independent weekly quest save.
+const AUTUMN_PASS_RESET_KEY = 'egoist_autumn_fest_pass_reset_v7723';
+if (storage.getItem(AUTUMN_PASS_RESET_KEY) !== '1') {
+    storage.removeItem(HALLOWEEN_PASS_KEY);
+    storage.removeItem(HALLOWEEN_QUEST_KEY);
+    storage.setItem(AUTUMN_PASS_RESET_KEY, '1');
+}
 const HALLOWEEN_WEEKLY_SEED = [
     { id:'hw1', titleKey:'weekly_quest_matches', goal:5, progress:0, completed:false, claimed:false, type:'matches' },
     { id:'hw2', titleKey:'weekly_quest_special_goals', goal:5, progress:0, completed:false, claimed:false, type:'special_goals' },
@@ -12478,18 +13226,27 @@ let halloweenPassQuests = readJSON(HALLOWEEN_QUEST_KEY, HALLOWEEN_QUEST_SEED).ma
 if (!halloweenPassQuests.length) halloweenPassQuests = HALLOWEEN_QUEST_SEED.map(q => ({ ...q }));
 
 const HALLOWEEN_GRADIENTS = {
-    toxicSlime: 'GRADIENT: Toxic Slime (#00FF9D-#4A0099)',
-    midnightSpectral: 'GRADIENT: Midnight Spectral (#140924-#B47AFF)',
-    toxicSlimePremium: 'GRADIENT: Toxic Slime Premium (#00FF9D-#0A0A0A)',
-    bloodMoon: 'GRADIENT: Blood Moon (#B3001B-#140924)'
+    toxicSlime: 'GRADIENT: Amber Glow (#F2B705-#E8631A)',
+    midnightSpectral: 'GRADIENT: Deep Autumn Night (#2B1A0E-#E8631A)',
+    toxicSlimePremium: 'GRADIENT: Golden Harvest (#F2B705-#8B5A2B)',
+    bloodMoon: 'GRADIENT: Crimson Leaves (#E23B28-#2B1A0E)',
+    autumnAmber: 'GRADIENT: Autumn Amber (#E8631A-#D99B1B)',
+    forestOlive: 'GRADIENT: Forest Olive (#8FA028-#6B4226)',
+    // Legacy saved gradient values remain recognized for existing inventories.
+    legacyToxicSlime: 'GRADIENT: Toxic Slime (#00FF9D-#4A0099)',
+    legacyMidnightSpectral: 'GRADIENT: Midnight Spectral (#140924-#B47AFF)',
+    legacyToxicSlimePremium: 'GRADIENT: Toxic Slime Premium (#00FF9D-#0A0A0A)',
+    legacyBloodMoon: 'GRADIENT: Blood Moon (#B3001B-#140924)'
 };
 // These four gradients stay outside the normal gradient-crate pool; ownership is stored in egoist_colors.
 const HALLOWEEN_C_SHOT_SKILLS = new Set(['directShot','blazeEmberShot','kaiserImpact','destroyerCurve','destroyerAwkCurve','demonDragonHeader','lazyTrapVolley']);
 const HALLOWEEN_BALLS = {
-    pumpkinStandard: { value:'MOTIVO: Palla Zucca Standard', key:'pass_reward_ball_pumpkin' },
-    pumpkinMechanical: { value:'MOTIVO: Palla Zucca Meccanica', key:'pass_reward_ball_mechanical' },
-    spectralEyeball: { value:'MOTIVO: Palla Oculo Spettrale', key:'pass_reward_ball_oculo' },
-    ghostBall: { value:'MOTIVO: Palla Fantasma', key:'pass_reward_ball_ghost' }
+    pumpkinStandard:  { value:'MOTIVO: Foglia Rossa', key:'pass_reward_ball_red_leaf' },
+    pumpkinMechanical:{ value:'MOTIVO: Foglia Bronzea', key:'pass_reward_ball_bronze_leaf' },
+    spectralEyeball:  { value:'MOTIVO: Ghianda Dorata', key:'pass_reward_ball_acorn' },
+    ghostBall:        { value:'MOTIVO: Nebbia Autunnale', key:'pass_reward_ball_mist' },
+    harvestMoon:      { value:'MOTIVO: Luna di Raccolta', key:'pass_reward_ball_harvest_moon' },
+    mapleLeaf:        { value:'MOTIVO: Foglia d\'Acero', key:'pass_reward_ball_maple' }
 };
 
 const HALLOWEEN_NORMAL_REWARDS = {};
@@ -12507,23 +13264,53 @@ for (let tier = 27; tier <= 29; tier++) HALLOWEEN_NORMAL_REWARDS[tier] = [{ type
 HALLOWEEN_NORMAL_REWARDS[30] = [{ type:'gradient', value:HALLOWEEN_GRADIENTS.midnightSpectral, key:'pass_reward_gradient_midnight' }];
 
 const HALLOWEEN_PREMIUM_REWARDS = {
-    1: [{ type:'styleSpins', amount:3 }],
-    3: [{ type:'goalVfx', id:'pumpkinBlast', key:'pass_reward_goal_pumpkin' }],
-    5: [{ type:'ball', value:HALLOWEEN_BALLS.pumpkinMechanical.value, key:HALLOWEEN_BALLS.pumpkinMechanical.key }],
-    7: [{ type:'gradient', value:HALLOWEEN_GRADIENTS.toxicSlimePremium, key:'pass_reward_gradient_toxic_premium' }],
-    10: [{ type:'goalVfx', id:'ghostPortal', key:'pass_reward_goal_portal' }],
-    12: [{ type:'ball', value:HALLOWEEN_BALLS.spectralEyeball.value, key:HALLOWEEN_BALLS.spectralEyeball.key }],
-    15: [{ type:'flowSpins', amount:5 }],
-    18: [{ type:'styleSpins', amount:5 }],
-    20: [{ type:'yen', amount:10000, displayKey:'pass_reward_yen_large' }],
-    22: [{ type:'boost', key:'pass_reward_bonus' }],
-    25: [{ type:'ball', value:HALLOWEEN_BALLS.ghostBall.value, key:HALLOWEEN_BALLS.ghostBall.key }],
-    28: [{ type:'styleSpins', amount:10 }, { type:'flowSpins', amount:10 }],
-    30: [
-        { type:'gradient', value:HALLOWEEN_GRADIENTS.bloodMoon, key:'pass_reward_gradient_blood_moon' },
-        { type:'yen', amount:20000, displayKey:'pass_reward_yen_mega' }
-    ]
+    1:  [{ type:'styleSpins', amount:3 }],
+    2:  [{ type:'goalVfx', id:'leafBurst', key:'pass_reward_goal_leaf_burst' }],
+    4:  [{ type:'ball', value:HALLOWEEN_BALLS.pumpkinMechanical.value, key:HALLOWEEN_BALLS.pumpkinMechanical.key }],
+    5:  [{ type:'goalVfx', id:'leafStorm', key:'pass_reward_goal_leaf_storm' }],
+    7:  [{ type:'gradient', value:HALLOWEEN_GRADIENTS.toxicSlimePremium, key:'pass_reward_gradient_toxic_premium' }],
+    8:  [{ type:'goalVfx', id:'amberSwirl', key:'pass_reward_goal_amber_swirl' }],
+    10: [{ type:'ball', value:HALLOWEEN_BALLS.spectralEyeball.value, key:HALLOWEEN_BALLS.spectralEyeball.key }],
+    12: [{ type:'flowSpins', amount:5 }],
+    13: [{ type:'styleSpins', amount:5 }],
+    15: [{ type:'yen', amount:10000, displayKey:'pass_reward_yen_large' }],
+    17: [{ type:'boost', key:'pass_reward_bonus' }],
+    18: [{ type:'ball', value:HALLOWEEN_BALLS.harvestMoon.value, key:HALLOWEEN_BALLS.harvestMoon.key }],
+    20: [{ type:'ball', value:HALLOWEEN_BALLS.ghostBall.value, key:HALLOWEEN_BALLS.ghostBall.key }],
+    21: [{ type:'ball', value:HALLOWEEN_BALLS.mapleLeaf.value, key:HALLOWEEN_BALLS.mapleLeaf.key }],
+    23: [{ type:'styleSpins', amount:10 }],
+    24: [{ type:'flowSpins', amount:10 }],
+    26: [{ type:'gradient', value:HALLOWEEN_GRADIENTS.bloodMoon, key:'pass_reward_gradient_blood_moon' }],
+    27: [{ type:'gradient', value:HALLOWEEN_GRADIENTS.autumnAmber, key:'pass_reward_gradient_autumn_amber' }],
+    28: [{ type:'gradient', value:HALLOWEEN_GRADIENTS.forestOlive, key:'pass_reward_gradient_forest_olive' }],
+    29: [{ type:'yen', amount:20000, displayKey:'pass_reward_yen_mega' }],
+    30: [{ type:'goalVfx', id:'harvestRune', key:'pass_reward_goal_harvest_rune' }]
 };
+
+// V7.7.23: seasonal Pass cosmetics are account rewards, not inventory sale stock.
+// Include legacy Halloween values so previously earned cosmetics stay protected too.
+const HALLOWEEN_PASS_PROTECTED_COLORS = new Set([
+    ...Object.values(HALLOWEEN_GRADIENTS),
+    ...Object.values(HALLOWEEN_NORMAL_REWARDS).flat().filter(r => r.type === 'gradient').map(r => r.value),
+    ...Object.values(HALLOWEEN_PREMIUM_REWARDS).flat().filter(r => r.type === 'gradient').map(r => r.value)
+]);
+const HALLOWEEN_PASS_PROTECTED_BALLS = new Set([
+    ...Object.values(HALLOWEEN_BALLS).map(r => r.value),
+    'MOTIVO: Palla Zucca Standard', 'MOTIVO: Palla Zucca Meccanica',
+    'MOTIVO: Palla Oculo Spettrale', 'MOTIVO: Palla Fantasma',
+    ...Object.values(HALLOWEEN_NORMAL_REWARDS).flat().filter(r => r.type === 'ball').map(r => r.value),
+    ...Object.values(HALLOWEEN_PREMIUM_REWARDS).flat().filter(r => r.type === 'ball').map(r => r.value)
+]);
+const HALLOWEEN_PASS_PROTECTED_GOAL_VFX = new Set(
+    GOAL_EXPLOSION_VFX.filter(vfx => vfx.halloween || vfx.autumn).map(vfx => vfx.id)
+);
+function isHalloweenPassRewardProtected(tab, value) {
+    const key = String(value ?? '');
+    if (tab === 'colors') return HALLOWEEN_PASS_PROTECTED_COLORS.has(key);
+    if (tab === 'balls') return HALLOWEEN_PASS_PROTECTED_BALLS.has(key);
+    if (tab === 'goalVfx') return HALLOWEEN_PASS_PROTECTED_GOAL_VFX.has(key);
+    return false;
+}
 
 function hpT(key, variables = {}) {
     return String(translateGameText(key)).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => variables[name] === undefined ? '' : String(variables[name]));
@@ -12739,6 +13526,34 @@ function claimReward(tier, track) {
     updateHalloweenPassDOM();
     return true;
 }
+function isHalloweenPassCycleComplete() {
+    const atMaxLevel = halloweenPass.level >= halloweenPass.maxLevel && halloweenPass.exp >= HALLOWEEN_PASS_MAX_EXP;
+    if (!atMaxLevel) return false;
+    const normalClaimed = Object.keys(HALLOWEEN_NORMAL_REWARDS).every(tier => halloweenPass.claimedNormal.includes(Number(tier)));
+    const premiumClaimed = !halloweenPass.isPremium || Object.keys(HALLOWEEN_PREMIUM_REWARDS).every(tier => halloweenPass.claimedPremium.includes(Number(tier)));
+    return normalClaimed && premiumClaimed;
+}
+function resetHalloweenPassCycle() {
+    if (!isHalloweenPassCycleComplete()) {
+        showNotification(hpT('pass_reset_not_ready'));
+        return false;
+    }
+    if (!window.confirm(hpT('pass_reset_confirm'))) return false;
+
+    halloweenPass.level = 1;
+    halloweenPass.exp = 0;
+    halloweenPass.claimedNormal = [];
+    halloweenPass.claimedPremium = [];
+    halloweenPass.bonusTier22 = false;
+    // Manual cycle reset keeps the already-purchased Premium entitlement.
+    halloweenPassQuests = HALLOWEEN_QUEST_SEED.map(quest => ({ ...quest, progress:0, completed:false, claimed:false }));
+    flushHalloweenPassState();
+    updateHalloweenPassDOM();
+    const shell = document.getElementById('halloweenPassShell');
+    if (shell) shell.querySelectorAll('.hp-track-scroll').forEach(track => { track.scrollLeft = 0; });
+    showNotification(hpT('pass_reset_success'));
+    return true;
+}
 function purchasePremium() {
     if (halloweenPass.isPremium) { showNotification(hpT('pass_premium_already')); return false; }
     if (userYen < 5000) { showNotification(hpT('pass_not_enough_yen')); return false; }
@@ -12839,7 +13654,7 @@ function renderHalloweenPassUI() {
         const rewardLabel = halloweenWeeklyRewardLabel(quest);
         return `<article class="hp-quest ${done ? 'hp-quest-done' : ''}" data-weekly-quest-id="${hpEscape(quest.id)}"><div class="hp-quest-title">${hpEscape(hpT(quest.titleKey))}</div><div class="hp-quest-meta"><span>${hpT('pass_weekly_progress')}</span><strong data-hp-weekly-progress>${progress}/${quest.goal}</strong><span>${hpEscape(rewardLabel)}</span></div><div class="hp-quest-rail"><div class="hp-quest-fill" style="width:${Math.max(0,Math.min(100,progress/quest.goal*100))}%"></div></div><button class="hp-quest-button" type="button" ${quest.claimed || !done ? 'disabled' : ''} onclick="claimHalloweenWeeklyQuest('${hpEscape(quest.id)}')">${hpEscape(halloweenWeeklyQuestButtonText(quest))}</button></article>`;
     }).join('');
-    shell.innerHTML = `<header class="hp-header"><div><div class="hp-kicker">${hpEscape(hpT('pass_season'))}</div><h1 id="hpDialogTitle" class="hp-title">🎃 <span>EGOIST SPOOK</span> // ${hpEscape(hpT('pass_halloween_title'))}</h1><div class="hp-subtitle">${hpEscape(hpT('pass_halloween_subtitle'))}</div></div><button class="hp-close" type="button" onclick="closeHalloweenPassUI()">${hpEscape(hpT('pass_close'))}</button></header><div class="hp-content"><section class="hp-summary"><div class="hp-stat"><div class="hp-stat-label">${hpEscape(hpT('pass_level'))}</div><div class="hp-stat-value"><strong id="hpLevelValue">${level}</strong> / ${halloweenPass.maxLevel}</div></div><div class="hp-progress-card"><div class="hp-progress-head"><span>${hpEscape(hpT('pass_progress'))}</span><b id="hpExpValue">${hpFormatNumber(exp)} / ${hpFormatNumber(HALLOWEEN_PASS_MAX_EXP)} EXP</b></div><div class="hp-progress-rail"><div id="hpProgressFill" class="hp-progress-fill" style="width:${pct}%"></div></div><div class="hp-progress-foot"><span>${hpEscape(hpT('pass_exp_total'))}</span><span id="hpProgressPct">${Math.round(pct)}%</span></div></div><div id="hpPremiumCta" class="hp-premium-cta">${premiumCopy}</div></section><section class="hp-level-shop" aria-label="${hpEscape(hpT('pass_buy_levels_title'))}"><div class="hp-level-shop-copy"><div class="hp-stat-label">${hpEscape(hpT('pass_level_shop_kicker'))}</div><h2 class="hp-level-shop-title">${hpEscape(hpT('pass_buy_levels_title'))}</h2><p class="hp-level-shop-desc">${hpEscape(hpT('pass_buy_levels_desc'))}</p><div class="hp-level-shop-wallet"><span>${hpEscape(hpT('pass_available_yen'))}</span><strong id="hpLevelShopYen">${hpFormatNumber(userYen)} ¥</strong><span id="hpLevelShopCurrentLevel">${hpEscape(hpT('pass_current_level', { level }))}</span></div></div><div class="hp-level-shop-buttons"><button class="hp-level-buy-button" type="button" data-hp-buy-levels="1" onclick="buyHalloweenPassLevels(1)">${hpEscape(hpT('pass_buy_level_button', { cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL) }))}</button><button class="hp-level-buy-button" type="button" data-hp-buy-levels="5" onclick="buyHalloweenPassLevels(5)">${hpEscape(hpT('pass_buy_levels_button', { count: 5, cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL * 5) }))}</button><button class="hp-level-buy-button" type="button" data-hp-buy-levels="10" onclick="buyHalloweenPassLevels(10)">${hpEscape(hpT('pass_buy_levels_button', { count: 10, cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL * 10) }))}</button></div></section><section class="hp-section"><div class="hp-section-heading"><h2>✦ <em>${hpEscape(hpT('pass_track_premium'))}</em></h2><small id="hpPremiumTrackStatus">${hpEscape(hpT('pass_premium'))} • ${halloweenPass.isPremium ? '✓' : '5.000 ¥'}</small></div><div class="hp-track-wrap"><div class="hp-track-scroll" aria-label="${hpEscape(hpT('pass_track_premium'))}">${Array.from({length:30},(_,i)=>buildHalloweenTierCard(i+1,'premium')).join('')}</div></div></section><section class="hp-section"><div class="hp-section-heading"><h2>◇ ${hpEscape(hpT('pass_track_normal'))}</h2><small>${hpEscape(hpT('pass_free'))} • 30 ${hpEscape(hpT('pass_level').toLowerCase())}</small></div><div class="hp-track-wrap"><div class="hp-track-scroll" aria-label="${hpEscape(hpT('pass_track_normal'))}">${Array.from({length:30},(_,i)=>buildHalloweenTierCard(i+1,'normal')).join('')}</div></div></section><section class="hp-section"><div class="hp-section-heading"><h2>☣ ${hpEscape(hpT('pass_quests_title'))}</h2><small>${hpEscape(hpT('pass_quests_hint'))}</small></div><div class="hp-quests">${questsHtml}</div></section><section class="hp-section" data-weekly-section="true"><div class="hp-section-heading"><h2>◷ <em>${hpEscape(hpT('pass_weekly_title'))}</em></h2><div class="hp-weekly-head-meta"><small>${hpEscape(hpT('pass_weekly_hint'))}</small><small id="hpWeeklyCountdown" class="hp-weekly-countdown">${hpEscape(hpT('pass_weekly_reset_in', { time: halloweenWeeklyCountdownLabel() }))}</small></div></div><div class="hp-quests">${weeklyQuestsHtml}</div></section><div class="hp-footnote">${hpEscape(hpT('pass_season_note'))}</div></div>`;
+    shell.innerHTML = `<header class="hp-header"><div><div class="hp-kicker">${hpEscape(hpT('pass_season'))}</div><h1 id="hpDialogTitle" class="hp-title">🍂 <span>EGOIST AUTUMN</span> // ${hpEscape(hpT('pass_halloween_title'))}</h1><div class="hp-subtitle">${hpEscape(hpT('pass_halloween_subtitle'))}</div></div><button class="hp-close" type="button" onclick="closeHalloweenPassUI()">${hpEscape(hpT('pass_close'))}</button></header><div class="hp-content"><section class="hp-summary"><div class="hp-stat"><div class="hp-stat-label">${hpEscape(hpT('pass_level'))}</div><div class="hp-stat-value"><strong id="hpLevelValue">${level}</strong> / ${halloweenPass.maxLevel}</div></div><div class="hp-progress-card"><div class="hp-progress-head"><span>${hpEscape(hpT('pass_progress'))}</span><b id="hpExpValue">${hpFormatNumber(exp)} / ${hpFormatNumber(HALLOWEEN_PASS_MAX_EXP)} EXP</b></div><div class="hp-progress-rail"><div id="hpProgressFill" class="hp-progress-fill" style="width:${pct}%"></div></div><div class="hp-progress-foot"><span>${hpEscape(hpT('pass_exp_total'))}</span><span id="hpProgressPct">${Math.round(pct)}%</span></div></div><div id="hpPremiumCta" class="hp-premium-cta">${premiumCopy}</div></section><section class="hp-cycle-reset-panel" id="hpCycleResetPanel" hidden><div class="hp-cycle-reset-copy"><strong>${hpEscape(hpT('pass_reset_title'))}</strong><span>${hpEscape(hpT('pass_reset_desc'))}</span></div><button class="hp-cycle-reset-button" type="button" onclick="resetHalloweenPassCycle()">${hpEscape(hpT('pass_reset_button'))}</button></section><section class="hp-level-shop" aria-label="${hpEscape(hpT('pass_buy_levels_title'))}"><div class="hp-level-shop-copy"><div class="hp-stat-label">${hpEscape(hpT('pass_level_shop_kicker'))}</div><h2 class="hp-level-shop-title">${hpEscape(hpT('pass_buy_levels_title'))}</h2><p class="hp-level-shop-desc">${hpEscape(hpT('pass_buy_levels_desc'))}</p><div class="hp-level-shop-wallet"><span>${hpEscape(hpT('pass_available_yen'))}</span><strong id="hpLevelShopYen">${hpFormatNumber(userYen)} ¥</strong><span id="hpLevelShopCurrentLevel">${hpEscape(hpT('pass_current_level', { level }))}</span></div></div><div class="hp-level-shop-buttons"><button class="hp-level-buy-button" type="button" data-hp-buy-levels="1" onclick="buyHalloweenPassLevels(1)">${hpEscape(hpT('pass_buy_level_button', { cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL) }))}</button><button class="hp-level-buy-button" type="button" data-hp-buy-levels="5" onclick="buyHalloweenPassLevels(5)">${hpEscape(hpT('pass_buy_levels_button', { count: 5, cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL * 5) }))}</button><button class="hp-level-buy-button" type="button" data-hp-buy-levels="10" onclick="buyHalloweenPassLevels(10)">${hpEscape(hpT('pass_buy_levels_button', { count: 10, cost: hpFormatNumber(HALLOWEEN_PASS_YEN_PER_LEVEL * 10) }))}</button></div></section><section class="hp-section"><div class="hp-section-heading"><h2>✦ <em>${hpEscape(hpT('pass_track_premium'))}</em></h2><small id="hpPremiumTrackStatus">${hpEscape(hpT('pass_premium'))} • ${halloweenPass.isPremium ? '✓' : '5.000 ¥'}</small></div><div class="hp-track-wrap"><div class="hp-track-scroll" aria-label="${hpEscape(hpT('pass_track_premium'))}">${Array.from({length:30},(_,i)=>buildHalloweenTierCard(i+1,'premium')).join('')}</div></div></section><section class="hp-section"><div class="hp-section-heading"><h2>◇ ${hpEscape(hpT('pass_track_normal'))}</h2><small>${hpEscape(hpT('pass_free'))} • 30 ${hpEscape(hpT('pass_level').toLowerCase())}</small></div><div class="hp-track-wrap"><div class="hp-track-scroll" aria-label="${hpEscape(hpT('pass_track_normal'))}">${Array.from({length:30},(_,i)=>buildHalloweenTierCard(i+1,'normal')).join('')}</div></div></section><section class="hp-section"><div class="hp-section-heading"><h2>🍁 ${hpEscape(hpT('pass_quests_title'))}</h2><small>${hpEscape(hpT('pass_quests_hint'))}</small></div><div class="hp-quests">${questsHtml}</div></section><section class="hp-section" data-weekly-section="true"><div class="hp-section-heading"><h2>◷ <em>${hpEscape(hpT('pass_weekly_title'))}</em></h2><div class="hp-weekly-head-meta"><small>${hpEscape(hpT('pass_weekly_hint'))}</small><small id="hpWeeklyCountdown" class="hp-weekly-countdown">${hpEscape(hpT('pass_weekly_reset_in', { time: halloweenWeeklyCountdownLabel() }))}</small></div></div><div class="hp-quests">${weeklyQuestsHtml}</div></section><div class="hp-footnote">${hpEscape(hpT('pass_season_note'))}</div></div>`;
     shell.dataset.built = '1';
     shell.dataset.locale = gameLanguage;
     shell.dataset.premiumActive = halloweenPass.isPremium ? 'true' : 'false';
@@ -12866,6 +13681,8 @@ function updateHalloweenPassDOM() {
     setText('#hpLevelValue', level);
     setText('#hpExpValue', `${hpFormatNumber(exp)} / ${hpFormatNumber(HALLOWEEN_PASS_MAX_EXP)} EXP`);
     setText('#hpProgressPct', `${Math.round(pct)}%`);
+    const resetPanel = shell.querySelector('#hpCycleResetPanel');
+    if (resetPanel) resetPanel.hidden = !isHalloweenPassCycleComplete();
     const progressFill = shell.querySelector('#hpProgressFill');
     if (progressFill && progressFill.style.width !== `${pct}%`) progressFill.style.width = `${pct}%`;
 
@@ -12980,12 +13797,13 @@ function openHalloweenPassUI() {
     if (!overlay.classList.contains('open')) halloweenPassPreviousGameState = gameState === 'halloweenPass' ? 'menu' : gameState;
     gameState = 'halloweenPass';
     overlay.classList.add('open');
+    if (window.__autumnLeaves) window.__autumnLeaves.start();
     overlay.setAttribute('aria-hidden', 'false');
     renderHalloweenPassUI();
 }
 function closeHalloweenPassUI() {
     const overlay = document.getElementById('halloweenPassOverlay');
-    if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true'); }
+    if (overlay) { overlay.classList.remove('open'); if (window.__autumnLeaves) window.__autumnLeaves.stop(); overlay.setAttribute('aria-hidden', 'true'); }
     if (gameState === 'halloweenPass') gameState = halloweenPassPreviousGameState || 'menu';
 }
 const halloweenPassOverlay = document.getElementById('halloweenPassOverlay');
@@ -13013,83 +13831,218 @@ setInterval(() => {
 }, 1000);
 
 function drawHalloweenBall(drawCtx, ballData, pattern) {
-    if (!pattern || !String(pattern).startsWith('MOTIVO: Palla ')) return false;
+    if (!pattern) return false;
     const skin = String(pattern);
-    if (!Object.values(HALLOWEEN_BALLS).some(item => item.value === skin)) return false;
+    const known = Object.values(HALLOWEEN_BALLS).some(i => i.value === skin)
+              || skin === 'MOTIVO: Foglia Rossa'
+              || skin === 'MOTIVO: Foglia Bronzea'
+              || skin === 'MOTIVO: Ghianda Dorata'
+              || skin === 'MOTIVO: Nebbia Autunnale'
+              || skin === 'MOTIVO: Palla Zucca Standard'
+              || skin === 'MOTIVO: Palla Zucca Meccanica'
+              || skin === 'MOTIVO: Palla Oculo Spettrale'
+              || skin === 'MOTIVO: Palla Fantasma';
+    if (!known) return false;
+
     const x = Number(ballData.x) || 0, y = Number(ballData.y) || 0;
     const r = Math.max(1, Number(ballData.radius) || 8);
     const rot = Number(ballData.rotationAngle) || 0;
+    const t = performance.now() * 0.001;
+
     drawCtx.save();
     drawCtx.translate(x, y);
     drawCtx.rotate(rot);
-    drawCtx.globalCompositeOperation = 'source-over';
     drawCtx.beginPath(); drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.clip();
-    if (skin === HALLOWEEN_BALLS.pumpkinStandard.value || skin === HALLOWEEN_BALLS.pumpkinMechanical.value) {
-        const grad = drawCtx.createRadialGradient(-r*.32,-r*.35,r*.1,0,0,r*1.2);
-        grad.addColorStop(0,'#FFC06C'); grad.addColorStop(.48,'#FF8A19'); grad.addColorStop(1,'#C64300');
-        drawCtx.fillStyle = grad; drawCtx.beginPath(); drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
-        drawCtx.strokeStyle = '#261322'; drawCtx.lineWidth = Math.max(1.1,r*.11);
-        for (let i=0;i<6;i++) { drawCtx.beginPath(); drawCtx.ellipse(0,0,r*.28,r*.92,i*Math.PI/6,0,Math.PI*2); drawCtx.stroke(); }
-        drawCtx.fillStyle = '#00FF9D'; drawCtx.beginPath(); drawCtx.roundRect ? drawCtx.roundRect(-r*.09,-r*.98,r*.18,r*.29,r*.05) : drawCtx.rect(-r*.09,-r*.98,r*.18,r*.29); drawCtx.fill();
-        if (skin === HALLOWEEN_BALLS.pumpkinMechanical.value) {
-            const blink = Math.sin(performance.now()*.026) > 0 ? 1 : .15;
-            drawCtx.fillStyle = `rgba(255,25,35,${blink})`; drawCtx.shadowColor = '#FF1D35'; drawCtx.shadowBlur = r*.35;
-            drawCtx.beginPath(); drawCtx.ellipse(-r*.34,-r*.15,r*.14,r*.2,-.2,0,Math.PI*2); drawCtx.fill();
-            drawCtx.beginPath(); drawCtx.ellipse(r*.34,-r*.15,r*.14,r*.2,.2,0,Math.PI*2); drawCtx.fill(); drawCtx.shadowBlur = 0;
-            drawCtx.strokeStyle = '#FFE9B8'; drawCtx.lineWidth = Math.max(1,r*.06);
-            for (let i=0;i<4;i++) { drawCtx.beginPath(); drawCtx.moveTo(-r*.62+i*r*.28,r*.48); drawCtx.lineTo(-r*.5+i*r*.28,r*.62); drawCtx.stroke(); }
-        } else {
-            drawCtx.strokeStyle = '#FFDCA0'; drawCtx.lineWidth = Math.max(.8,r*.045); drawCtx.beginPath(); drawCtx.arc(0,0,r*.68,0,Math.PI*2); drawCtx.stroke();
+
+    if (skin === 'MOTIVO: Foglia Rossa' || skin === 'MOTIVO: Foglia d\'Acero' || skin === 'MOTIVO: Palla Zucca Standard') {
+        // Sfera rossa con foglia d'acero bianca
+        const g = drawCtx.createRadialGradient(-r*.35,-r*.4,r*.05, 0,0,r*1.15);
+        g.addColorStop(0,'#FF8B60'); g.addColorStop(.4,'#E23B28');
+        g.addColorStop(.85,'#8A0F13'); g.addColorStop(1,'#3A0207');
+        drawCtx.fillStyle = g; drawCtx.beginPath();
+        drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
+        // foglia d'acero stilizzata al centro
+        drawCtx.save(); drawCtx.rotate(Math.sin(t*.6)*.15 + rot*.1);
+        drawCtx.fillStyle = 'rgba(247,233,201,.88)';
+        drawCtx.beginPath();
+        for (let i=0;i<=10;i++){
+            const a=(i/10)*Math.PI*2 - Math.PI/2;
+            const rr=(i%2===0)?r*.55:r*.22;
+            const px=Math.cos(a)*rr, py=Math.sin(a)*rr;
+            if(i===0) drawCtx.moveTo(px,py); else drawCtx.lineTo(px,py);
         }
-    } else if (skin === HALLOWEEN_BALLS.spectralEyeball.value) {
-        const base = drawCtx.createRadialGradient(-r*.2,-r*.28,r*.08,0,0,r*1.1);
-        base.addColorStop(0,'#FFFFFF'); base.addColorStop(.68,'#E6DFFF'); base.addColorStop(1,'#A898C9');
-        drawCtx.fillStyle=base; drawCtx.beginPath(); drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
-        const irisAngle = rot*1.6 + performance.now()*.0017;
-        drawCtx.save(); drawCtx.rotate(irisAngle);
-        const iris = drawCtx.createRadialGradient(0,0,r*.06,0,0,r*.58);
-        iris.addColorStop(0,'#1B0D2A'); iris.addColorStop(.27,'#7132B2'); iris.addColorStop(.72,'#B47AFF'); iris.addColorStop(1,'#00FF9D');
-        drawCtx.fillStyle=iris; drawCtx.beginPath(); drawCtx.arc(0,0,r*.57,0,Math.PI*2); drawCtx.fill();
-        drawCtx.strokeStyle='rgba(4,5,10,.65)'; drawCtx.lineWidth=Math.max(.8,r*.06);
-        for(let i=0;i<10;i++){const a=i*Math.PI/5;drawCtx.beginPath();drawCtx.moveTo(Math.cos(a)*r*.38,Math.sin(a)*r*.38);drawCtx.lineTo(Math.cos(a)*r*.51,Math.sin(a)*r*.51);drawCtx.stroke();}
-        drawCtx.fillStyle='#04050A'; drawCtx.beginPath(); drawCtx.ellipse(r*.08,-r*.02,r*.24,r*.29,.15,0,Math.PI*2); drawCtx.fill();
-        drawCtx.fillStyle='rgba(255,255,255,.92)'; drawCtx.beginPath(); drawCtx.arc(-r*.13,-r*.18,r*.09,0,Math.PI*2); drawCtx.fill(); drawCtx.restore();
-    } else if (skin === HALLOWEEN_BALLS.ghostBall.value) {
-        drawCtx.globalAlpha=.7;
-        const ghostGrad=drawCtx.createRadialGradient(-r*.25,-r*.3,r*.1,0,0,r*1.2);
-        ghostGrad.addColorStop(0,'#FFFFFF');ghostGrad.addColorStop(.65,'#DCCBFF');ghostGrad.addColorStop(1,'#8C7BAA');
-        drawCtx.fillStyle=ghostGrad;drawCtx.beginPath();drawCtx.arc(0,0,r,0,Math.PI*2);drawCtx.fill();drawCtx.globalAlpha=1;
-        drawCtx.strokeStyle='rgba(180,122,255,.9)';drawCtx.lineWidth=Math.max(1,r*.07);drawCtx.beginPath();drawCtx.arc(0,0,r*.75,0,Math.PI*2);drawCtx.stroke();
-        for(let i=0;i<7;i++){
-            const a=i*Math.PI*2/7+performance.now()*.0015;
-            const rr=r*(.62+.12*Math.sin(performance.now()*.004+i));
-            drawCtx.fillStyle=i%2?'rgba(0,255,157,.82)':'rgba(180,122,255,.9)';
-            drawCtx.beginPath();drawCtx.arc(Math.cos(a)*rr,Math.sin(a)*rr,r*(.065+(i%3)*.012),0,Math.PI*2);drawCtx.fill();
-        }
-        drawCtx.fillStyle='rgba(4,5,10,.85)';drawCtx.beginPath();drawCtx.arc(-r*.22,-r*.05,r*.09,0,Math.PI*2);drawCtx.arc(r*.22,-r*.05,r*.09,0,Math.PI*2);drawCtx.fill();
+        drawCtx.closePath(); drawCtx.fill();
+        drawCtx.strokeStyle = '#5A0709'; drawCtx.lineWidth = Math.max(.7,r*.045);
+        drawCtx.beginPath(); drawCtx.moveTo(0,-r*.5); drawCtx.lineTo(0,r*.5); drawCtx.stroke();
+        drawCtx.restore();
+        // ombra in basso a destra
+        drawCtx.fillStyle = 'rgba(0,0,0,.25)';
+        drawCtx.beginPath(); drawCtx.arc(r*.35, r*.35, r*.7, 0, Math.PI*2); drawCtx.fill();
     }
+    else if (skin === 'MOTIVO: Foglia Bronzea' || skin === 'MOTIVO: Ghianda Dorata' || skin === 'MOTIVO: Palla Zucca Meccanica' || skin === 'MOTIVO: Palla Oculo Spettrale') {
+        // Sfera legno-marrone con anello intagliato
+        const g = drawCtx.createRadialGradient(-r*.3,-r*.35,r*.05, 0,0,r*1.1);
+        g.addColorStop(0,'#D9A56B'); g.addColorStop(.45,'#8B5A2B');
+        g.addColorStop(.85,'#3E2411'); g.addColorStop(1,'#1B0E06');
+        drawCtx.fillStyle = g; drawCtx.beginPath();
+        drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
+        // venature concentriche
+        drawCtx.strokeStyle = 'rgba(247,233,201,.28)';
+        drawCtx.lineWidth = Math.max(.6,r*.06);
+        for (let ring=1; ring<=3; ring++) {
+            drawCtx.beginPath(); drawCtx.arc(0,0,r*(.22+ring*.18),0,Math.PI*2); drawCtx.stroke();
+        }
+        // piccola ghianda
+        drawCtx.fillStyle = '#F2B705';
+        drawCtx.beginPath(); drawCtx.ellipse(0, -r*.05, r*.22, r*.28, 0, 0, Math.PI*2); drawCtx.fill();
+        drawCtx.fillStyle = '#3E2411';
+        drawCtx.beginPath(); drawCtx.ellipse(0, -r*.28, r*.24, r*.1, 0, 0, Math.PI*2); drawCtx.fill();
+        drawCtx.fillStyle = '#6B4226';
+        drawCtx.fillRect(-r*.02, -r*.42, r*.04, r*.12);
+    }
+    else if (skin === 'MOTIVO: Nebbia Autunnale' || skin === 'MOTIVO: Palla Fantasma') {
+        // Sfera grigio-ambra con nebbia rotante
+        const g = drawCtx.createRadialGradient(0,0,r*.1, 0,0,r*1.1);
+        g.addColorStop(0,'#E8D3AE'); g.addColorStop(.6,'#8B5A2B');
+        g.addColorStop(1,'#3E2411');
+        drawCtx.fillStyle = g; drawCtx.beginPath();
+        drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
+        // volute di nebbia
+        drawCtx.save();
+        drawCtx.globalAlpha = .55;
+        for (let i=0;i<3;i++){
+            const angle = t*.4 + i*Math.PI*2/3;
+            drawCtx.strokeStyle = i%2?'#F7E9C9':'#F2B705';
+            drawCtx.lineWidth = Math.max(.8, r*.07);
+            drawCtx.beginPath();
+            for (let k=0;k<=20;k++){
+                const u=k/20, a=angle+u*Math.PI*1.4, rr=u*r*.78;
+                const px=Math.cos(a)*rr, py=Math.sin(a)*rr;
+                if(k===0) drawCtx.moveTo(px,py); else drawCtx.lineTo(px,py);
+            }
+            drawCtx.stroke();
+        }
+        drawCtx.restore();
+    }
+    else if (skin === 'MOTIVO: Luna di Raccolta') {
+        // Sfera ambra-arancio con luna piena e foglioline
+        const g = drawCtx.createRadialGradient(-r*.3,-r*.4,r*.05, 0,0,r*1.15);
+        g.addColorStop(0,'#FFD24A'); g.addColorStop(.5,'#E8631A');
+        g.addColorStop(.9,'#B33C00'); g.addColorStop(1,'#5A1A00');
+        drawCtx.fillStyle = g; drawCtx.beginPath();
+        drawCtx.arc(0,0,r,0,Math.PI*2); drawCtx.fill();
+        // luna
+        drawCtx.fillStyle = '#F7E9C9';
+        drawCtx.beginPath(); drawCtx.arc(-r*.05,-r*.1,r*.42,0,Math.PI*2); drawCtx.fill();
+        drawCtx.fillStyle = '#E8631A';
+        drawCtx.beginPath(); drawCtx.arc(r*.05,-r*.18,r*.38,0,Math.PI*2); drawCtx.fill();
+        // foglioline orbitanti
+        for(let i=0;i<5;i++){
+            const a = t*.5 + i*Math.PI*2/5, rr=r*.72;
+            drawCtx.save(); drawCtx.translate(Math.cos(a)*rr, Math.sin(a)*rr); drawCtx.rotate(a);
+            drawCtx.fillStyle = i%2?'#F2B705':'#E23B28';
+            drawCtx.beginPath(); drawCtx.ellipse(0,0,r*.08,r*.14,0,0,Math.PI*2); drawCtx.fill();
+            drawCtx.restore();
+        }
+    }
+    // altri (foglia bronzea, ghianda) sono gestiti sopra
+
     drawCtx.restore();
-    drawCtx.save(); drawCtx.strokeStyle='rgba(4,5,10,.92)'; drawCtx.lineWidth=Math.max(.8,r*.09); drawCtx.beginPath(); drawCtx.arc(x,y,r,0,Math.PI*2); drawCtx.stroke(); drawCtx.restore();
+    // bordo esterno
+    drawCtx.save();
+    drawCtx.strokeStyle = 'rgba(43,26,14,.95)';
+    drawCtx.lineWidth = Math.max(.9, r*.1);
+    drawCtx.beginPath(); drawCtx.arc(x,y,r,0,Math.PI*2); drawCtx.stroke();
+    drawCtx.restore();
     return true;
 }
+
 function drawHalloweenGoalExplosion(fx) {
     if (!fx || !gameSettings.particlesEnabled) return;
-    const t=Math.max(0,Math.min(1,fx.age/fx.life)), fade=Math.pow(1-t,.85), r=24+(1-Math.pow(1-t,2))*250;
-    const ctxFx=ctx;
-    ctxFx.save(); ctxFx.translate(fx.x,fx.y); ctxFx.globalCompositeOperation='lighter'; ctxFx.globalAlpha=fade; ctxFx.lineCap='round'; ctxFx.lineJoin='round';
+    const t = Math.max(0, Math.min(1, fx.age / fx.life));
+    const fade = Math.pow(1 - t, .85);
+    const r = 24 + (1 - Math.pow(1 - t, 2)) * 250;
+    const ctxFx = ctx;
+    ctxFx.save();
+    ctxFx.translate(fx.x, fx.y);
+    ctxFx.globalCompositeOperation = 'lighter';
+    ctxFx.globalAlpha = fade;
+    ctxFx.lineCap = 'round';
+    ctxFx.lineJoin = 'round';
+
     if (fx.id === 'pumpkinBlast') {
-        const flash=ctxFx.createRadialGradient(0,0,2,0,0,r*.55);flash.addColorStop(0,'rgba(255,245,210,.95)');flash.addColorStop(.3,'rgba(255,122,0,.74)');flash.addColorStop(1,'rgba(255,122,0,0)');
-        ctxFx.fillStyle=flash;ctxFx.beginPath();ctxFx.arc(0,0,r*.55,0,Math.PI*2);ctxFx.fill();
-        for(let i=0;i<3;i++){ctxFx.strokeStyle=i===1?'#FFE4B5':(i===2?'#B47AFF':'#FF7A00');ctxFx.lineWidth=(4-i)*(.9-t*.7);ctxFx.beginPath();ctxFx.arc(0,0,r*(.3+i*.28),fx.seed+i*.9+t*.7,fx.seed+i*.9+Math.PI*1.75+t*.7);ctxFx.stroke();}
-        for(let i=0;i<24;i++){const a=fx.seed+i*Math.PI*2/24+t*.25,inner=r*(.25+(i%3)*.05),outer=r*(.65+(i%4)*.1);ctxFx.strokeStyle=i%3?'#FF7A00':'#B47AFF';ctxFx.lineWidth=2.5*(1-t)+.5;ctxFx.beginPath();ctxFx.moveTo(Math.cos(a)*inner,Math.sin(a)*inner);ctxFx.lineTo(Math.cos(a+.12)*outer,Math.sin(a+.12)*outer);ctxFx.stroke();}
-        for(let i=0;i<12;i++){const a=fx.seed+i*2.399+t*(i%2?1:-.6),rr=r*(.38+(i%5)*.13),sz=(3+i%4)*(1-t*.5);ctxFx.save();ctxFx.translate(Math.cos(a)*rr,Math.sin(a)*rr);ctxFx.rotate(a+t*5);ctxFx.fillStyle=i%2?'#FF7A00':'#FFD18A';ctxFx.beginPath();ctxFx.moveTo(-sz,-sz);ctxFx.lineTo(sz,0);ctxFx.lineTo(-sz,sz);ctxFx.closePath();ctxFx.fill();ctxFx.restore();}
-    } else {
+        const flash = ctxFx.createRadialGradient(0,0,2,0,0,r*.55);
+        flash.addColorStop(0,'rgba(255,245,210,.95)'); flash.addColorStop(.3,'rgba(255,122,0,.74)'); flash.addColorStop(1,'rgba(255,122,0,0)');
+        ctxFx.fillStyle = flash; ctxFx.beginPath(); ctxFx.arc(0,0,r*.55,0,Math.PI*2); ctxFx.fill();
+        for (let i=0;i<3;i++) {
+            ctxFx.strokeStyle = i===1 ? '#FFE4B5' : (i===2 ? '#B47AFF' : '#FF7A00');
+            ctxFx.lineWidth = (4-i)*(.9-t*.7); ctxFx.beginPath(); ctxFx.arc(0,0,r*(.3+i*.28),fx.seed+i*.9+t*.7,fx.seed+i*.9+Math.PI*1.75+t*.7); ctxFx.stroke();
+        }
+        for (let i=0;i<24;i++) {
+            const a=fx.seed+i*Math.PI*2/24+t*.25, inner=r*(.25+(i%3)*.05), outer=r*(.65+(i%4)*.1);
+            ctxFx.strokeStyle=i%3?'#FF7A00':'#B47AFF'; ctxFx.lineWidth=2.5*(1-t)+.5;
+            ctxFx.beginPath(); ctxFx.moveTo(Math.cos(a)*inner,Math.sin(a)*inner); ctxFx.lineTo(Math.cos(a+.12)*outer,Math.sin(a+.12)*outer); ctxFx.stroke();
+        }
+        for (let i=0;i<12;i++) {
+            const a=fx.seed+i*2.399+t*(i%2?1:-.6), rr=r*(.38+(i%5)*.13), sz=(3+i%4)*(1-t*.5);
+            ctxFx.save(); ctxFx.translate(Math.cos(a)*rr,Math.sin(a)*rr); ctxFx.rotate(a+t*5);            ctxFx.fillStyle=i%2?'#FF7A00':'#FFD18A'; ctxFx.beginPath(); ctxFx.moveTo(-sz,-sz); ctxFx.lineTo(sz,0); ctxFx.lineTo(-sz,sz); ctxFx.closePath(); ctxFx.fill(); ctxFx.restore();
+        }
+    } else if (fx.id === 'ghostPortal') {
         const portalR=r*(.45+.1*Math.sin(t*Math.PI));
-        const halo=ctxFx.createRadialGradient(0,0,portalR*.12,0,0,r*.9);halo.addColorStop(0,'rgba(180,122,255,.24)');halo.addColorStop(.5,'rgba(0,255,157,.08)');halo.addColorStop(1,'rgba(180,122,255,0)');
-        ctxFx.fillStyle=halo;ctxFx.beginPath();ctxFx.arc(0,0,r*.9,0,Math.PI*2);ctxFx.fill();
-        for(let ring=0;ring<5;ring++){ctxFx.strokeStyle=ring%2?'#00FF9D':'#B47AFF';ctxFx.lineWidth=(5-ring*.55)*(1-t*.65);ctxFx.beginPath();ctxFx.ellipse(0,0,portalR*(.48+ring*.14),portalR*(.82+ring*.07),fx.seed*.07+ring*.16+t*.8,fx.seed+t*(ring%2?2.3:-1.8),fx.seed+Math.PI*(1.25+ring*.08)+t*(ring%2?2.3:-1.8));ctxFx.stroke();}
-        for(let i=0;i<32;i++){const a=fx.seed+i*2.399+t*(i%2?2.5:-1.6),rr=r*(.22+((i%11)/11)*.72),sz=(2+i%4)*(1-t*.35);ctxFx.fillStyle=i%3?'#B47AFF':'#00FF9D';ctxFx.beginPath();ctxFx.arc(Math.cos(a)*rr,Math.sin(a)*rr,sz,0,Math.PI*2);ctxFx.fill();}
-        ctxFx.strokeStyle='rgba(220,200,255,.75)';ctxFx.lineWidth=2;ctxFx.beginPath();ctxFx.ellipse(0,0,portalR*.28,portalR*.6,-fx.seed-t*.8,0,Math.PI*2);ctxFx.stroke();
+        const halo=ctxFx.createRadialGradient(0,0,portalR*.12,0,0,r*.9);
+        halo.addColorStop(0,'rgba(180,122,255,.24)'); halo.addColorStop(.5,'rgba(0,255,157,.08)'); halo.addColorStop(1,'rgba(180,122,255,0)');
+        ctxFx.fillStyle=halo; ctxFx.beginPath(); ctxFx.arc(0,0,r*.9,0,Math.PI*2); ctxFx.fill();
+        for(let ring=0;ring<5;ring++) {
+            ctxFx.strokeStyle=ring%2?'#00FF9D':'#B47AFF'; ctxFx.lineWidth=(5-ring*.55)*(1-t*.65);
+            ctxFx.beginPath(); ctxFx.ellipse(0,0,portalR*(.48+ring*.14),portalR*(.82+ring*.07),fx.seed*.07+ring*.16+t*.8,fx.seed+t*(ring%2?2.3:-1.8),fx.seed+Math.PI*(1.25+ring*.08)+t*(ring%2?2.3:-1.8)); ctxFx.stroke();
+        }
+        for(let i=0;i<32;i++) {
+            const a=fx.seed+i*2.399+t*(i%2?2.5:-1.6), rr=r*(.22+((i%11)/11)*.72), sz=(2+i%4)*(1-t*.35);
+            ctxFx.fillStyle=i%3?'#B47AFF':'#00FF9D'; ctxFx.beginPath(); ctxFx.arc(Math.cos(a)*rr,Math.sin(a)*rr,sz,0,Math.PI*2); ctxFx.fill();
+        }
+        ctxFx.strokeStyle='rgba(220,200,255,.75)'; ctxFx.lineWidth=2; ctxFx.beginPath(); ctxFx.ellipse(0,0,portalR*.28,portalR*.6,-fx.seed-t*.8,0,Math.PI*2); ctxFx.stroke();
+    } else if (fx.kind === 12) {
+        // LEAF BURST: foglie d'acero che esplodono radialmente.
+        const ringR=r*(.35+Math.sin(t*Math.PI)*.55);
+        for(let i=0;i<20;i++) {
+            const a=fx.seed+i*Math.PI*2/20+t*.9;
+            const rad=r*(.3+.7*(1-Math.pow(1-t,2)))*(.7+(i%3)*.15);
+            ctxFx.save(); ctxFx.translate(Math.cos(a)*rad,Math.sin(a)*rad*.7); ctxFx.rotate(a+t*.8);
+            ctxFx.fillStyle=i%3===0?'#F2B705':(i%3===1?'#E8631A':'#E23B28'); ctxFx.strokeStyle='#5A1A00'; ctxFx.lineWidth=1.2;
+            ctxFx.beginPath();
+            for(let k=0;k<=10;k++) { const aa=(k/10)*Math.PI*2-Math.PI/2, rr=(k%2===0)?8:3.2, lx=Math.cos(aa)*rr, ly=Math.sin(aa)*rr; if(k===0)ctxFx.moveTo(lx,ly);else ctxFx.lineTo(lx,ly); }
+            ctxFx.closePath(); ctxFx.fill(); ctxFx.stroke(); ctxFx.restore();
+        }
+        ctxFx.strokeStyle='#F2B705'; ctxFx.lineWidth=3.5*(1-t)+.6; ctxFx.beginPath(); ctxFx.arc(0,0,ringR,0,Math.PI*2); ctxFx.stroke();
+        if(t<.3) { const flash=ctxFx.createRadialGradient(0,0,2,0,0,r*.55); flash.addColorStop(0,'#FFF2B0'); flash.addColorStop(.4,'#E8631A'); flash.addColorStop(1,'rgba(232,99,26,0)'); ctxFx.fillStyle=flash; ctxFx.beginPath(); ctxFx.arc(0,0,r*.55,0,Math.PI*2); ctxFx.fill(); }
+    } else if (fx.kind === 13) {
+        // AMBER SWIRL: doppia spirale dorata in espansione.
+        const turns=5.5, maxR=r*1.05*(1-Math.pow(1-t,1.6));
+        ctxFx.strokeStyle='#F2B705'; ctxFx.lineWidth=2.6*(1-t*.4)+.4; ctxFx.beginPath();
+        for(let i=0;i<=140;i++) { const u=i/140,a=fx.seed+u*turns*Math.PI*2+t*3,rr=u*maxR,px=Math.cos(a)*rr,py=Math.sin(a)*rr*.85; if(i===0)ctxFx.moveTo(px,py);else ctxFx.lineTo(px,py); }
+        ctxFx.stroke();
+        ctxFx.strokeStyle='#E23B28'; ctxFx.lineWidth=1.8*(1-t*.3)+.3; ctxFx.beginPath();
+        for(let i=0;i<=140;i++) { const u=i/140,a=-fx.seed-u*turns*Math.PI*2-t*3,rr=u*maxR*.75,px=Math.cos(a)*rr,py=Math.sin(a)*rr*.85; if(i===0)ctxFx.moveTo(px,py);else ctxFx.lineTo(px,py); }
+        ctxFx.stroke();
+        for(let i=0;i<12;i++) { const u=((fx.age*.04+i/12)%1),a=fx.seed+u*turns*Math.PI*2,rr=u*r*1.05; ctxFx.fillStyle=i%2?'#FFF2B0':'#F2B705'; ctxFx.beginPath(); ctxFx.arc(Math.cos(a)*rr,Math.sin(a)*rr*.85,2.6-u*1.4,0,Math.PI*2); ctxFx.fill(); }
+    } else if (fx.kind === 14) {
+        // LEAF STORM: vortice di foglie rosse e cremisi.
+        const stormR=r*(.4+.8*(1-Math.pow(1-t,1.8)));
+        for(let i=0;i<28;i++) {
+            const a=fx.seed+i*2.399+t*(1.4-(i%3)*.2), innerR=stormR*(.35+(i%5)*.13), px=Math.cos(a)*innerR, py=Math.sin(a)*innerR*.55-(1-t)*18;
+            ctxFx.save(); ctxFx.translate(px,py); ctxFx.rotate(a+t*(i%2?1.2:-1.1));
+            ctxFx.fillStyle=i%4===0?'#B31E22':(i%4===1?'#E23B28':(i%4===2?'#E8631A':'#8A0F13')); ctxFx.strokeStyle='#3A0207'; ctxFx.lineWidth=1;
+            ctxFx.beginPath(); ctxFx.moveTo(0,-7); ctxFx.quadraticCurveTo(5,0,0,7); ctxFx.quadraticCurveTo(-5,0,0,-7); ctxFx.closePath(); ctxFx.fill(); ctxFx.stroke();
+            ctxFx.beginPath(); ctxFx.moveTo(0,-5); ctxFx.lineTo(0,5); ctxFx.stroke(); ctxFx.restore();
+        }
+        ctxFx.strokeStyle='#B31E22'; ctxFx.lineWidth=3*(1-t)+.7; ctxFx.beginPath(); ctxFx.arc(0,0,stormR*.9,0,Math.PI*2); ctxFx.stroke();
+    } else if (fx.kind === 15) {
+        // HARVEST RUNE: sigillo runico con spighe di grano.
+        const rr=r*(.55+.45*(1-Math.pow(1-t,1.5)));
+        ctxFx.strokeStyle='#8B5A2B'; ctxFx.lineWidth=3.5*(1-t*.6)+.6; ctxFx.beginPath(); ctxFx.arc(0,0,rr,0,Math.PI*2); ctxFx.stroke();
+        for(let i=0;i<6;i++) { const a=fx.seed+i*Math.PI/3,x1=Math.cos(a)*rr*.55,y1=Math.sin(a)*rr*.55,x2=Math.cos(a)*rr,y2=Math.sin(a)*rr; ctxFx.strokeStyle=i%2?'#F2B705':'#8B5A2B'; ctxFx.lineWidth=2.2*(1-t)+.5; ctxFx.beginPath(); ctxFx.moveTo(x1,y1); ctxFx.lineTo(x2,y2); ctxFx.stroke(); }
+        for(let i=0;i<6;i++) { const a=fx.seed+i*Math.PI/3,bx=Math.cos(a)*rr,by=Math.sin(a)*rr; ctxFx.save(); ctxFx.translate(bx,by); ctxFx.rotate(a+Math.PI/2); ctxFx.strokeStyle='#F2B705'; ctxFx.lineWidth=1.3; ctxFx.beginPath(); ctxFx.moveTo(0,0); ctxFx.lineTo(0,-9); ctxFx.stroke(); for(let k=0;k<4;k++){const yk=-2-k*2.5;ctxFx.beginPath();ctxFx.moveTo(0,yk);ctxFx.lineTo(-3,yk-2);ctxFx.moveTo(0,yk);ctxFx.lineTo(3,yk-2);ctxFx.stroke();} ctxFx.restore(); }
+        if(t>.3) { ctxFx.globalAlpha=fade*(1-t); ctxFx.strokeStyle='#F2B705'; ctxFx.lineWidth=2; const r2=rr*(1.15+.3*Math.sin(t*Math.PI)); ctxFx.beginPath(); ctxFx.arc(0,0,r2,0,Math.PI*2); ctxFx.stroke(); }
     }
     ctxFx.restore();
 }
@@ -14031,8 +14984,7 @@ function update() {
 
     updateChameleonSystems();
 
-    bots.forEach(b => {
-        if (b.role === 'gk' && (b.botAwkAnimTimer || 0) <= 0 && !b.lazyFakeStunned) {
+    bots.forEach(b => {        if (b.role === 'gk' && (b.botAwkAnimTimer || 0) <= 0 && !b.lazyFakeStunned) {
             b.stunTimer = 0;
         }
         if (b.role === 'gk' && ball.owner === b) {
@@ -15031,8 +15983,7 @@ function drawPantherSprite(x, y) {
     }));
     ctx.restore();
     // Shoulder, backline and chest rim lights.
-    ctx.strokeStyle = 'rgba(255,239,251,.82)'; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(-30, -14); ctx.quadraticCurveTo(-8, -18, 13, -14); ctx.quadraticCurveTo(20, -14, 24, -10); ctx.stroke();
-    const shoulder = ctx.createRadialGradient(22, -6, 1, 23, -3, 16); shoulder.addColorStop(0, 'rgba(255,235,249,.58)'); shoulder.addColorStop(.65, 'rgba(255,92,180,.16)'); shoulder.addColorStop(1, 'rgba(95,12,51,.18)');
+    ctx.strokeStyle = 'rgba(255,239,251,.82)'; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(-30, -14); ctx.quadraticCurveTo(-8, -18, 13, -14); ctx.quadraticCurveTo(20, -14, 24, -10); ctx.stroke();    const shoulder = ctx.createRadialGradient(22, -6, 1, 23, -3, 16); shoulder.addColorStop(0, 'rgba(255,235,249,.58)'); shoulder.addColorStop(.65, 'rgba(255,92,180,.16)'); shoulder.addColorStop(1, 'rgba(95,12,51,.18)');
     ctx.fillStyle = shoulder; ctx.beginPath(); ctx.ellipse(22, -2, 12, 14, .12, 0, Math.PI * 2); ctx.fill();
     drawPantherLegVfx(19, 5, gait + Math.PI * .04, true, run);
     drawPantherLegVfx(29, 5, gait + Math.PI * .93, true, run);
@@ -16031,8 +16982,7 @@ function drawZombieWorldFx() {
     if (zombieDribbleTrail.length > 2 && currentStyle && currentStyle.id === 'zombie') {
         const trail = zombieDribbleTrail;
         const makeOffsetPath = (offset) => trail.map((point, i) => {
-            const prev = trail[Math.max(0, i - 1)], next = trail[Math.min(trail.length - 1, i + 1)];
-            let tx = next.x - prev.x, ty = next.y - prev.y, len = Math.hypot(tx, ty) || 1;
+            const prev = trail[Math.max(0, i - 1)], next = trail[Math.min(trail.length - 1, i + 1)];            let tx = next.x - prev.x, ty = next.y - prev.y, len = Math.hypot(tx, ty) || 1;
             const lifeAlpha = Math.max(0, Math.min(1, point.life / 38));
             return { x: point.x - ty / len * offset, y: point.y + tx / len * offset, alpha: lifeAlpha };
         });
@@ -16629,7 +17579,13 @@ function drawMatchScoreboard() {
 function draw() {
     if (gameState === 'halloweenPass') return; // V7.2: the opaque DOM Battle Pass covers the canvas; skip all hidden canvas rendering.
     syncAbilityHudVisibility();
-    syncBotEditorDock(); drawMain(); drawSharkOrbitalScreenFx(); drawRealKingCinematicOverlay(); drawZombieWorldFx(); drawGoalExplosionVfx();
+    syncBotEditorDock();
+    // LAN screens render independently; the 60 Hz game/update loop is untouched.
+    if (gameState === 'lanMenu') { drawLANMenuScreen(); drawShowcaseOverlay(); drawFpsOverlay(); drawV49ClickPops(); return; }
+    if (gameState === 'lanHost') { drawLANHostScreen(); drawShowcaseOverlay(); drawFpsOverlay(); drawV49ClickPops(); return; }
+    if (gameState === 'lanJoin') { drawLANJoinScreen(); drawShowcaseOverlay(); drawFpsOverlay(); drawV49ClickPops(); return; }
+    if (gameState === 'lanLobby') { drawLANLobbyScreen(); drawShowcaseOverlay(); drawFpsOverlay(); drawV49ClickPops(); return; }
+    drawMain(); drawSharkOrbitalScreenFx(); drawRealKingCinematicOverlay(); drawZombieWorldFx(); drawGoalExplosionVfx();
     drawGlobalAwkFocusVfx(); drawShowcaseOverlay(); drawDemonKingUnlockAnimation(); drawAikuMasteryUnlockAnimation();
     drawRealKingUnlockAnimation(); drawFpsOverlay(); drawDestroyerPredatorOverlay(); drawActionIFrameEffects();
     if (gameState === 'playing' && botControlMode === 'editor') {
@@ -17025,8 +17981,7 @@ function drawMain() {
             ctx.globalAlpha = Math.max(0, noticeAlpha);
             fillRoundRect(ctx, 305, 686, 670, 30, 9, 'rgba(3,5,16,.96)', '#FF4AB8', 1.2);
             ctx.textAlign = 'center'; ctx.fillStyle = '#FFB5E9';
-            ctx.font = '700 15px "Teko", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';
-            ctx.fillText(notificationBanner.text, canvas.width / 2, 706, 640);
+            ctx.font = '700 15px "Teko", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';            ctx.fillText(notificationBanner.text, canvas.width / 2, 706, 640);
             ctx.restore();
         }
         return;
@@ -17084,7 +18039,7 @@ function drawMain() {
         ctx.fillStyle = '#FF007F'; ctx.font = '700 20px "Teko", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';
         ctx.fillText("🟥 ROSSI", canvas.width / 2 + 90, 226);
 
-        let btnW = 360, btnH = 46;
+        let btnW = 360, btnH = 42;
         let centerX = canvas.width / 2 - btnW / 2;
 
         let drawMenuButton = (y, text, colorTheme, icon) => {
@@ -17118,6 +18073,7 @@ function drawMain() {
         drawMenuButton(520, "NEGOZIO EGOISTA", "#FFD45A", "🛒");
         drawMenuButton(564, "RANKED • 5V5", "#35F6FF", "🏆");
         drawMenuButton(608, "AGGIORNAMENTI / CHANGELOG", "#B98CFF", "📜");
+        drawMenuButton(652, "LAN • GIOCA IN RETE", "#00FF9D", "🌐");
 
         // Career-level HUD for the main menu, built from this profile's saved lifetime stats.
         const levelCard = { x: 972, y: 210, w: 280, h: 116 };
@@ -17148,7 +18104,7 @@ function drawMain() {
         ctx.restore(); drawStadium(); drawPitchDesign();
         ctx.fillStyle = 'rgba(3,5,16,.965)'; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.textAlign = 'center'; ctx.fillStyle = '#35F6FF'; ctx.font = '700 15px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';
-        ctx.fillText('EGOIST SYSTEM • V7.7.19 TEST • DAILY NORMAL QUESTS', canvas.width / 2, 48);
+        ctx.fillText('EGOIST SYSTEM • V7.7.23 TEST • AUTUMN PASS REWORK', canvas.width / 2, 48);
         ctx.fillStyle = '#FFFFFF'; ctx.font = '700 43px "Teko", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';
         ctx.fillText('CHANGELOG • AGGIORNAMENTI', canvas.width/2, 91);
         const markAllHot = mouseX >= 835 && mouseX <= 1135 && mouseY >= 122 && mouseY <= 160;
@@ -17162,9 +18118,32 @@ function drawMain() {
         changelogUpdateHitRows = [];
         let cursorY = viewport.y + 12 - changelogScroll;
         let totalContentHeight = 12;
+        const lanChangeByLanguage = {"it":["2Dlock V7.7.20 TEST • ANTEPRIMA LAN + FIX SKIP PASS","Aggiunte al menu principale le schermate LAN GAME, HOST, JOIN e sala d’attesa, con pulsante LAN, campo IPv4 modificabile da tastiera e navigazione cliccabile. Nella versione browser le schermate funzionano solo come anteprima: l’indirizzo mostrato è dimostrativo e non viene aperta alcuna connessione Wi-Fi o socket; il networking reale richiede il bridge della build desktop. Corretto anche lo Skip Pass: il possesso acquistato nello Shop è separato dall’attivazione nelle Impostazioni, che ora può soltanto attivare/disattivare un pass già posseduto. I salvataggi esistenti con Skip Pass attivo vengono migrati. Loop fisso a 60 Hz, gameplay, fisica, VFX, Ranked, Gacha, missioni e Battle Pass invariati."],"en":["2Dlock V7.7.20 TEST • LAN PREVIEW + SKIP PASS FIX","Added LAN GAME, HOST, JOIN, and waiting-room screens to the main menu, including an IPv4 field editable from the keyboard and clickable navigation. In the browser build these screens are preview-only: the displayed address is a placeholder and no Wi-Fi or socket connection is opened; real networking requires the desktop build bridge. Also fixed Skip Pass ownership: purchasing in the Shop is now separate from activation in Settings, which can only toggle a pass already owned. Existing saves with Skip Pass enabled are migrated. The fixed 60 Hz loop, gameplay, physics, VFX, Ranked, Gacha, quests, and Battle Pass remain unchanged."],"fr":["2Dlock V7.7.20 TEST • APERÇU LAN + CORRECTIF SKIP PASS","Ajout des écrans LAN GAME, HOST, JOIN et salle d’attente au menu principal, avec un champ IPv4 modifiable au clavier et une navigation cliquable. Dans la version navigateur, ces écrans restent une prévisualisation : l’adresse affichée est fictive et aucune connexion Wi-Fi ni socket n’est ouverte ; le réseau réel nécessite le bridge de la version desktop. Correction du Skip Pass : l’achat dans la boutique est désormais séparé de l’activation dans les paramètres, qui ne peut qu’activer ou désactiver un pass déjà possédé. Les anciennes sauvegardes avec le pass actif sont migrées. Boucle fixe à 60 Hz, gameplay, physique, VFX, Ranked, Gacha, quêtes et Battle Pass inchangés."],"es":["2Dlock V7.7.20 TEST • VISTA PREVIA LAN + FIX SKIP PASS","Se añadieron las pantallas LAN GAME, HOST, JOIN y sala de espera al menú principal, con un campo IPv4 editable mediante el teclado y navegación interactiva. En la versión del navegador estas pantallas son solo una vista previa: la dirección mostrada es ficticia y no se abre ninguna conexión Wi-Fi ni socket; la red real requiere el bridge de la versión de escritorio. También se corrigió la propiedad de Skip Pass: la compra en la tienda está separada de la activación en Ajustes, que ahora solo puede activar o desactivar un pase ya adquirido. Se migran las partidas guardadas existentes con Skip Pass activo. El bucle fijo de 60 Hz, el juego, la física, los VFX, Ranked, Gacha, misiones y Battle Pass permanecen sin cambios."]};
         const dailyChangeByLanguage = {"it":["2Dlock V7.7.19 TEST • MISSIONI NORMALI GIORNALIERE","Le missioni normali Egoiste ora si rinnovano automaticamente ogni 24 ore, usando il timestamp di generazione già esistente. Il countdown del Mission Control è esteso a un giorno e, al reset, compare una notifica tradotta in italiano, inglese, francese o spagnolo. Il reset avviene anche al successivo avvio se è trascorso un giorno dall’ultimo rinnovo. Pool QUEST_MASTER_POOL, obiettivi, ricompense, salvataggi esistenti, missioni Halloween stagionali e settimanali, loop a 60 Hz e meccaniche di gioco invariati."],"en":["2Dlock V7.7.19 TEST • DAILY NORMAL QUESTS","Normal Egoist quests now refresh automatically every 24 hours using the existing generation timestamp. The Mission Control countdown now covers a full day, and a reset notice appears in Italian, English, French, or Spanish. If the game is reopened after a day has elapsed, the overdue reset is applied on startup as well. QUEST_MASTER_POOL, objectives, rewards, existing save keys, Halloween seasonal and weekly quests, the 60 Hz loop, and gameplay mechanics remain unchanged."],"fr":["2Dlock V7.7.19 TEST • QUÊTES NORMALES QUOTIDIENNES","Les quêtes normales Egoist se renouvellent désormais automatiquement toutes les 24 heures, à partir de l’horodatage de génération déjà utilisé. Le compte à rebours de Mission Control couvre une journée complète et une notification de réinitialisation apparaît en italien, anglais, français ou espagnol. Si le jeu est relancé après une journée d’absence, le renouvellement en retard est aussi appliqué au démarrage. QUEST_MASTER_POOL, objectifs, récompenses, clés de sauvegarde existantes, quêtes Halloween saisonnières et hebdomadaires, boucle à 60 Hz et mécaniques restent inchangés."],"es":["2Dlock V7.7.19 TEST • MISIONES NORMALES DIARIAS","Las misiones normales Egoist ahora se renuevan automáticamente cada 24 horas usando la marca de tiempo de generación existente. La cuenta atrás de Mission Control abarca un día completo y aparece un aviso de reinicio en italiano, inglés, francés o español. Si se vuelve a abrir el juego después de un día, el reinicio pendiente también se aplica al iniciar. QUEST_MASTER_POOL, objetivos, recompensas, claves de guardado existentes, misiones de Halloween estacionales y semanales, bucle de 60 Hz y mecánicas permanecen intactos."]};
         const weeklyChangeByLanguage = {"it":["2Dlock V7.7.18 TEST • MISSIONI SETTIMANALI BATTLE PASS","Aggiunta una sezione SETTIMANALE autonoma al Battle Pass Halloween con cinque missioni: partite, gol con abilità [C], dribbling [Q], vittorie senza subire gol e attivazioni Flow/AWK. Ogni lunedì i progressi settimanali si azzerano secondo lo stesso calendario di Ranked; un countdown mostra il tempo rimanente e una notifica annuncia il reset. Ogni obiettivo ha progressi, stato di riscatto, EXP Battle Pass e bonus Yen indipendenti dalle missioni stagionali. Salvataggio isolato in egoist_halloween_weekly_pass; etichette, missioni e notifiche tradotte in italiano, inglese, francese e spagnolo. Loop fisso 60 Hz, fisica, VFX, Gacha, Ranked, quest normali, progressione e Pass Premium preservati."],"en":["2Dlock V7.7.18 TEST • BATTLE PASS WEEKLY MISSIONS","Added a dedicated WEEKLY section to the Halloween Battle Pass with five missions: matches, goals with ability [C], [Q] dribbles, wins without conceding, and Flow/AWK activations. Weekly progress resets every Monday using the same calendar key as Ranked; a countdown shows the remaining time and a notification announces the reset. Each objective has separate progress and claim state, Battle Pass EXP, and bonus Yen, independent from seasonal quests. State is isolated in egoist_halloween_weekly_pass; labels, missions, and notices are translated into Italian, English, French, and Spanish. The fixed 60 Hz loop, physics, VFX, Gacha, Ranked, normal quests, progression, and Premium Pass remain unchanged."],"fr":["2Dlock V7.7.18 TEST • MISSIONS HEBDOMADAIRES DU PASS","Ajout d’une section HEBDOMADAIRE dédiée au Pass Halloween avec cinq missions : matchs, buts avec la capacité [C], dribbles [Q], victoires sans encaisser de but et activations Flow/AWK. La progression est réinitialisée chaque lundi selon la même clé de calendrier que Ranked ; un compte à rebours affiche le temps restant et une notification annonce la réinitialisation. Chaque objectif possède sa propre progression, son état de récupération, de l’EXP du Pass et un bonus en yens, séparés des quêtes saisonnières. Sauvegarde isolée dans egoist_halloween_weekly_pass ; libellés, missions et notifications traduits en italien, anglais, français et espagnol. Boucle fixe à 60 Hz, physique, VFX, Gacha, Ranked, quêtes normales, progression et Pass Premium préservés."],"es":["2Dlock V7.7.18 TEST • MISIONES SEMANALES DEL PASE","Añadida una sección SEMANAL dedicada al Pase de Halloween con cinco misiones: partidos, goles con la habilidad [C], regates [Q], victorias sin encajar goles y activaciones de Flow/AWK. El progreso semanal se reinicia cada lunes usando la misma clave de calendario que Ranked; una cuenta atrás muestra el tiempo restante y una notificación anuncia el reinicio. Cada objetivo tiene progreso y estado de reclamación propios, EXP del Pase y Yen extra, independientes de las misiones de temporada. Guardado aislado en egoist_halloween_weekly_pass; etiquetas, misiones y avisos traducidos al italiano, inglés, francés y español. Se mantienen intactos el bucle fijo de 60 Hz, la física, los VFX, Gacha, Ranked, las misiones normales, la progresión y el Pase Premium."]};
+        const autumnChangeByLanguage = {
+            it: ["2Dlock V7.7.21 TEST • EGOIST AUTUMN FEST", "Il Battle Pass stagionale diventa EGOIST AUTUMN FEST: nuova interfaccia in legno, palette marrone/arancio/ambra/cremisi, tier in stile tavoletta e foglie animate che cadono solo mentre l’overlay è aperto. Aggiunti sei gradienti, sei skin palla autunnali e quattro Goal Explosion (Leaf Burst, Amber Swirl, Leaf Storm, Harvest Rune), con ricompense integrate nei tier e traduzioni IT/EN/FR/ES. I vecchi ID delle esplosioni, le skin palla e i gradienti già salvati restano riconosciuti. Chiavi localStorage, gameState, funzioni Battle Pass, missioni normali giornaliere e missioni settimanali del lunedì restano invariati; anche LAN Browser Preview, Skip Pass, gameplay, fisica, VFX dei personaggi e loop fisso 60 Hz sono preservati."],
+            en: ["2Dlock V7.7.21 TEST • EGOIST AUTUMN FEST", "The seasonal Battle Pass becomes EGOIST AUTUMN FEST: a wood-inspired interface with brown/orange/amber/crimson colors, wooden tier cards and falling leaves that animate only while the overlay is open. Added six gradients, six Autumn ball skins and four Goal Explosions (Leaf Burst, Amber Swirl, Leaf Storm, Harvest Rune), integrated into the reward tiers and translated into IT/EN/FR/ES. Previously saved explosion IDs, ball skins and gradients remain recognized. localStorage keys, gameState, Battle Pass functions, daily normal quests and Monday weekly missions remain unchanged; LAN Browser Preview, Skip Pass, gameplay, physics, character VFX and the fixed 60 Hz loop are preserved."],
+            fr: ["2Dlock V7.7.21 TEST • EGOIST AUTUMN FEST", "Le Battle Pass saisonnier devient EGOIST AUTUMN FEST : interface inspirée du bois, palette brune/orange/ambre/cramoisie, paliers en bois et feuilles animées uniquement lorsque l’overlay est ouvert. Ajout de six dégradés, six skins de ballon d’automne et quatre Goal Explosions (Leaf Burst, Amber Swirl, Leaf Storm, Harvest Rune), intégrés aux paliers et traduits en IT/EN/FR/ES. Les anciens ID d’explosion, skins de ballon et dégradés enregistrés restent reconnus. Les clés localStorage, gameState, fonctions du Pass, quêtes normales quotidiennes et missions hebdomadaires du lundi restent inchangés ; l’aperçu LAN, Skip Pass, gameplay, physique, VFX des personnages et boucle fixe à 60 Hz sont préservés."],
+            es: ["2Dlock V7.7.21 TEST • EGOIST AUTUMN FEST", "El Battle Pass de temporada se convierte en EGOIST AUTUMN FEST: interfaz inspirada en madera, paleta marrón/naranja/ámbar/carmesí, niveles de madera y hojas animadas solo mientras el panel está abierto. Se añaden seis degradados, seis skins otoñales de balón y cuatro Goal Explosions (Leaf Burst, Amber Swirl, Leaf Storm, Harvest Rune), integradas en los niveles y traducidas a IT/EN/FR/ES. Los antiguos ID de explosión, skins de balón y degradados guardados siguen siendo reconocidos. Las claves localStorage, gameState, funciones del Pass, misiones normales diarias y misiones semanales de los lunes permanecen intactas; también se preservan LAN Browser Preview, Skip Pass, gameplay, física, VFX de personajes y el bucle fijo de 60 Hz."]
+        };
+        const passResetChangeByLanguage = {
+            it: ["2Dlock V7.7.22 TEST • RESET EGOIST AUTUMN FEST", "Avvio stagionale pulito del Battle Pass: al primo avvio di questa versione vengono azzerati livello, EXP, riscatti delle tracce Normale/Premium e progressi delle missioni stagionali del Pass. Si riparte dal livello 1 con 0 EXP e ricompense non reclamate. Yen, inventario e ricompense già ottenute, missioni normali giornaliere e progressi/riscatti delle missioni settimanali restano intatti. Il reset è eseguito una sola volta per profilo e usa le chiavi Battle Pass già esistenti; LAN, Skip Pass, gameplay e loop a 60 Hz invariati."],
+            en: ["2Dlock V7.7.22 TEST • EGOIST AUTUMN FEST RESET", "Fresh seasonal Battle Pass start: on the first launch of this version, pass level, EXP, Normal/Premium track claims and seasonal Pass quest progress are reset. The pass starts at level 1 with 0 EXP and unclaimed rewards. Yen, inventory and already-earned rewards, normal daily quests, and weekly mission progress/claims are preserved. The reset runs once per profile and keeps the existing Battle Pass storage keys; LAN, Skip Pass, gameplay and the 60 Hz loop remain unchanged."],
+            fr: ["2Dlock V7.7.22 TEST • RÉINITIALISATION DU PASS", "Nouveau départ saisonnier du Battle Pass : au premier lancement de cette version, le niveau, l’EXP, les récompenses récupérées des pistes Normale/Premium et la progression des quêtes saisonnières du Pass sont réinitialisés. Le Pass repart au niveau 1 avec 0 EXP et toutes les récompenses à récupérer. Les yens, l’inventaire et les récompenses déjà obtenues, les quêtes quotidiennes normales ainsi que la progression et les récupérations des missions hebdomadaires sont conservés. La réinitialisation n’a lieu qu’une fois par profil ; les clés de sauvegarde existantes sont conservées. LAN, Skip Pass, gameplay et boucle à 60 Hz inchangés."],
+            es: ["2Dlock V7.7.22 TEST • REINICIO DEL PASE", "Nuevo comienzo de temporada del Battle Pass: en el primer inicio de esta versión se reinician el nivel, la EXP, los premios reclamados de las rutas Normal/Premium y el progreso de las misiones de temporada del Pase. El Pase comienza en el nivel 1 con 0 EXP y recompensas sin reclamar. Se conservan los Yen, el inventario y las recompensas ya obtenidas, las misiones diarias normales y el progreso/reclamos de las misiones semanales. El reinicio se ejecuta una sola vez por perfil y conserva las claves de guardado existentes; LAN, Skip Pass, juego y bucle de 60 Hz permanecen intactos."]
+        };
+        const autumnPassReworkChangeByLanguage = {
+            it: ["2Dlock V7.7.23 TEST • PREMIUM DISTRIBUITO + PASS PROTETTO", "Ridistribuite le 21 ricompense Premium su 21 tier distinti: ogni livello Premium ora contiene al massimo un premio, senza pacchetti sovraccarichi ai tier 25/28/30. Gli oggetti cosmetici ottenuti dal Battle Pass, inclusi i vecchi oggetti Halloween, sono contrassegnati PASS e non possono essere venduti; gli altri oggetti mantengono la vendita normale. Aggiunto il pulsante RESETTA PASS, visibile solo al livello 30 dopo aver riscattato tutte le ricompense disponibili: il ciclo torna al livello 1 con 0 EXP, i progressi delle missioni stagionali si azzerano, mentre Premium, Yen, inventario e missioni settimanali restano attivi. Questa versione esegue inoltre un solo reset iniziale del Pass per salvataggio locale; missioni normali giornaliere, LAN, Skip Pass, gameplay e loop 60 Hz preservati."],
+            en: ["2Dlock V7.7.23 TEST • PREMIUM REWARD SPACING + PASS ITEM LOCK", "Distributed all 21 Premium reward items across 21 separate tiers, with at most one reward in each tier and no oversized bundles at tiers 25/28/30. Battle Pass cosmetics, including legacy Halloween rewards, now carry a PASS marker and cannot be sold; ordinary inventory items remain sellable. Added a RESET PASS button that appears only at level 30 after every available reward has been claimed: it starts a new cycle at level 1 with 0 EXP and resets seasonal quest progress while preserving Premium access, Yen, inventory and weekly missions. This version also performs one fresh Pass reset per local browser save on first launch; daily normal quests, LAN, Skip Pass, gameplay and the fixed 60 Hz loop are preserved."],
+            fr: ["2Dlock V7.7.23 TEST • RÉPARTITION PREMIUM + OBJETS PASS PROTÉGÉS", "Les 21 récompenses Premium sont réparties sur 21 paliers distincts, avec au maximum une récompense par palier et sans lots surchargés aux niveaux 25/28/30. Les objets cosmétiques du Battle Pass, y compris les anciennes récompenses Halloween, portent désormais la mention PASS et ne peuvent pas être vendus ; les autres objets restent vendables. Le bouton RÉINITIALISER LE PASS apparaît uniquement au niveau 30 après récupération de toutes les récompenses disponibles : un nouveau cycle démarre au niveau 1 avec 0 EXP, les quêtes saisonnières sont réinitialisées et l’accès Premium, les yens, l’inventaire et les missions hebdomadaires sont conservés. Cette version effectue aussi une réinitialisation initiale unique par sauvegarde locale du navigateur ; quêtes quotidiennes, LAN, Skip Pass, gameplay et boucle 60 Hz préservés."],
+            es: ["2Dlock V7.7.23 TEST • REPARTO PREMIUM + OBJETOS DEL PASE PROTEGIDOS", "Las 21 recompensas Premium se distribuyen en 21 niveles distintos, con un máximo de una recompensa por nivel y sin paquetes excesivos en los niveles 25/28/30. Los cosméticos obtenidos en el Battle Pass, incluidas las antiguas recompensas de Halloween, muestran la marca PASS y no se pueden vender; los demás objetos siguen siendo vendibles. El botón REINICIAR PASE aparece solo en el nivel 30 después de reclamar todas las recompensas disponibles: comienza un nuevo ciclo en el nivel 1 con 0 EXP y reinicia las misiones de temporada, conservando Premium, Yen, inventario y misiones semanales. Esta versión también reinicia el Pase una sola vez por almacenamiento local del navegador al primer inicio; se preservan las misiones diarias, LAN, Skip Pass, el juego y el bucle de 60 Hz."]
+        };
         const changes = [
+            autumnPassReworkChangeByLanguage[gameLanguage] || autumnPassReworkChangeByLanguage.en,
+            passResetChangeByLanguage[gameLanguage] || passResetChangeByLanguage.en,
+            autumnChangeByLanguage[gameLanguage] || autumnChangeByLanguage.en,
+            lanChangeByLanguage[gameLanguage] || lanChangeByLanguage.en,
             dailyChangeByLanguage[gameLanguage] || dailyChangeByLanguage.en,
             weeklyChangeByLanguage[gameLanguage] || weeklyChangeByLanguage.en,
             ['2Dlock V7.7.17 TEST • PANTHER NEON CHEETAH VFX',
@@ -17594,7 +18573,7 @@ function drawMain() {
         const prefRows = [
             ['Effetti particellari', gameSettings.particlesEnabled ? 'ATTIVI' : 'DISATTIVI', 202],
             ['Informazioni HUD', gameSettings.hudInfoEnabled ? 'ATTIVE' : 'DISATTIVE', 260],
-            ['Gamepass Skip Spin', hasSkipPass ? 'ATTIVO' : 'DISATTIVO', 318],
+            ['Gamepass Skip Spin', hasSkipPass ? 'ATTIVO' : (hasSkipPassPurchased ? 'DISATTIVO' : 'NON POSSEDUTO'), 318],
             ['Mixer audio  ›', `${gameSettings.volume}%`, 376],
             ['Mostra FPS', gameSettings.showFps ? 'ATTIVI' : 'DISATTIVI', 434],
             ['Qualità effetti', gameSettings.lowQuality ? 'BASSA · FPS' : 'ALTA · VFX', 490]
@@ -17673,7 +18652,7 @@ function drawMain() {
 
         drawShopBox(35, 180, 315, 120, "🍀 3x LUCKY SPIN STILI", "Solo Leggendari+", "1.200 ¥", "#FFD700");
         drawShopBox(370, 180, 315, 120, "🍀 3x LUCKY SPIN FLOW", "Solo Leggendari+", "1.200 ¥", "#FFD700");
-        drawShopBox(705, 180, 340, 120, "⚡ PASSO SKIP SPIN", hasSkipPass ? "SBLOCCATO ✅" : "Salta animazioni", "5.000 ¥", "#00FFFF");
+        drawShopBox(705, 180, 340, 120, "⚡ PASSO SKIP SPIN", hasSkipPassPurchased ? (hasSkipPass ? "SBLOCCATO ✅" : "ACQUISTATO · DISATTIVO") : "Salta animazioni", hasSkipPassPurchased ? "GIÀ ACQUISTATO" : "5.000 ¥", "#00FFFF");
 
         drawShopBox(25, 320, 238, 110, "📦 CHEST COLORI BASE", "Colori pieni classici", "200 ¥", "#00FFFF");
         drawShopBox(273, 320, 238, 110, "🎁 CHEST GRADIENT", "Gradient cyberpunk", "600 ¥", "#FF007F");
@@ -17788,7 +18767,13 @@ function drawMain() {
         });
 
         ctx.fillStyle = '#B0BEC5'; ctx.font = '600 14px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif';
-        ctx.fillText(activeInventoryTab === 'goalVfx' ? 'Clicca un’esplosione per equipaggiarla • VENDI per cedere una copia • ×N indica le copie accumulate' : 'Clicca per equipaggiare • VENDI per cedere una copia • ×N indica le copie accumulate', canvas.width / 2, 136);
+        const inventoryPassHint = ({
+            it:'Clicca per equipaggiare • Gli oggetti PASS sono protetti e non si vendono • ×N = copie',
+            en:'Click to equip • PASS items are protected and cannot be sold • ×N = copies',
+            fr:'Cliquez pour équiper • Les objets PASS sont protégés et invendables • ×N = copies',
+            es:'Haz clic para equipar • Los objetos PASS están protegidos y no se venden • ×N = copias'
+        })[gameLanguage] || 'Click to equip • PASS items are protected and cannot be sold • ×N = copies';
+        ctx.fillText(inventoryPassHint, canvas.width / 2, 136);
 
         let boxSize = 82, cols = 6, startY = 155;
         let startX = (canvas.width - (cols * boxSize + (cols - 1) * 16)) / 2;
@@ -17813,9 +18798,10 @@ function drawMain() {
                 renderPlayerColor(bx + boxSize/2, by + boxSize/2 - 8, 20, col, false);
                 drawInventoryStackBadge(bx, by, count, '#35F6FF');
 
-                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, '#B91F45', '#FF7998', .8);
-                ctx.fillStyle = '#FFF'; ctx.font = '700 11.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("VENDI", bx + boxSize - 15, by + 15);
+                const passLockedItem = isHalloweenPassRewardProtected('colors', col);
+                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, passLockedItem ? '#5B4218' : '#B91F45', passLockedItem ? '#F2B705' : '#FF7998', .8);
+                ctx.fillStyle = '#FFF'; ctx.font = '700 10.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(passLockedItem ? hpT('pass_item_tag') : 'VENDI', bx + boxSize - 18, by + 15);
                 ctx.textAlign = 'left';
 
                 if (isSelected) {
@@ -17841,9 +18827,10 @@ function drawMain() {
                 renderBallSkin(bx + boxSize/2, by + boxSize/2 - 8, 18, skin);
                 drawInventoryStackBadge(bx, by, count, '#FFD700');
 
-                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, '#B91F45', '#FF7998', .8);
-                ctx.fillStyle = '#FFF'; ctx.font = '700 11.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("VENDI", bx + boxSize - 15, by + 15);
+                const passLockedItem = isHalloweenPassRewardProtected('balls', skin);
+                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, passLockedItem ? '#5B4218' : '#B91F45', passLockedItem ? '#F2B705' : '#FF7998', .8);
+                ctx.fillStyle = '#FFF'; ctx.font = '700 10.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(passLockedItem ? hpT('pass_item_tag') : 'VENDI', bx + boxSize - 18, by + 15);
                 ctx.textAlign = 'left';
 
                 if (isSelected) {
@@ -17864,8 +18851,9 @@ function drawMain() {
                 fillRoundRect(ctx, bx, by, boxSize, boxSize, 15, 'rgba(18,8,35,.94)', isSelected ? def.color : 'rgba(255,255,255,.25)', isSelected ? 2.5 : 1.1);
                 drawGoalVfxPreview(bx + boxSize/2, by + 28, 20, id, def.color, 0);
                 drawInventoryStackBadge(bx, by, count, def.color);
-                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, '#B91F45', '#FF7998', .8);
-                ctx.fillStyle = '#FFF'; ctx.font = '700 11.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center'; ctx.fillText('VENDI', bx + boxSize - 15, by + 15); ctx.textAlign = 'left';
+                const passLockedItem = isHalloweenPassRewardProtected('goalVfx', id);
+                fillRoundRect(ctx, bx + boxSize - 34, by + 1, 32, 22, 7, passLockedItem ? '#5B4218' : '#B91F45', passLockedItem ? '#F2B705' : '#FF7998', .8);
+                ctx.fillStyle = '#FFF'; ctx.font = '700 10.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center'; ctx.fillText(passLockedItem ? hpT('pass_item_tag') : 'VENDI', bx + boxSize - 18, by + 15); ctx.textAlign = 'left';
                 ctx.fillStyle = '#FFFFFF'; ctx.font = '700 10.5px "Rajdhani", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif'; ctx.textAlign = 'center';
                 const shortName = def.name.length > 16 ? def.name.slice(0, 15) + '…' : def.name;
                 ctx.fillText(shortName, bx + boxSize/2, by + 57, boxSize - 6);
@@ -17992,7 +18980,6 @@ function drawMain() {
         ctx.lineWidth = 2.5;
         ctx.stroke();
     }
-
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.beginPath(); ctx.ellipse(player.x, player.y + player.radius - 2, player.radius, player.radius * 0.4, 0, 0, Math.PI * 2); ctx.fill();
 
@@ -18992,8 +19979,7 @@ canvas.addEventListener('pointerdown', function (event) {
 function drawV49ClickPops() {
     if (['playing', 'goalCelebration', 'replay', 'matchEnd'].includes(gameState)) { v49ClickPops.length = 0; return; }
     for (let i = v49ClickPops.length - 1; i >= 0; i--) {
-        const p = v49ClickPops[i]; p.life--;
-        if (p.life <= 0) { v49ClickPops.splice(i, 1); continue; }
+        const p = v49ClickPops[i]; p.life--;        if (p.life <= 0) { v49ClickPops.splice(i, 1); continue; }
         const t = 1 - p.life / p.max, alpha = Math.max(0, p.life / p.max);
         const r = 8 + t * 29;
         ctx.save(); ctx.globalAlpha = alpha;
@@ -19310,6 +20296,113 @@ function drawAnkleBreakerBanner() {
     ctx.restore();
 }
 
+/* ============================================================
+   AUTUMN LEAVES — foglie cadenti per il Battle Pass Autunno.
+   Non tocca il loop 60 Hz, la fisica o il gameplay.
+   ============================================================ */
+(function initAutumnLeaves() {
+  const cvs = document.getElementById('autumnLeavesCanvas');
+  if (!cvs) return;
+  const lc = cvs.getContext('2d');
+  let leaves = [], running = false, rafId = null;
+  const PAL = [
+    { fill:'#E8631A', vein:'#B33C00', type:'maple'  },
+    { fill:'#F2B705', vein:'#B8860B', type:'oak'    },
+    { fill:'#E23B28', vein:'#8A0F13', type:'maple'  },
+    { fill:'#D99B1B', vein:'#8B5A2B', type:'birch'  },
+    { fill:'#8FA028', vein:'#4A5A0F', type:'elm'    },
+    { fill:'#F28C28', vein:'#A94100', type:'oak'    },
+    { fill:'#B31E22', vein:'#5A0709', type:'maple'  },
+    { fill:'#FFCC33', vein:'#C99400', type:'birch'  }
+  ];
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cvs.width = window.innerWidth * dpr;
+    cvs.height = window.innerHeight * dpr;
+    cvs.style.width = window.innerWidth + 'px';
+    cvs.style.height = window.innerHeight + 'px';
+    lc.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function makeLeaf() {
+    const p = PAL[(Math.random()*PAL.length)|0];
+    return {
+      x: Math.random()*window.innerWidth,
+      y: -40 - Math.random()*120,
+      vx: (Math.random()-.5)*.8,
+      vy: .6 + Math.random()*1.4,
+      rot: Math.random()*Math.PI*2,
+      vrot: (Math.random()-.5)*.04,
+      scale: .55 + Math.random()*.9,
+      swayAmp: .6 + Math.random()*1.6,
+      swayPhase: Math.random()*Math.PI*2,
+      swaySpeed: .012 + Math.random()*.02,
+      life: 0, maxLife: 900 + Math.random()*600,
+      type:p.type, fill:p.fill, vein:p.vein
+    };
+  }
+  function drawMaple(c,s){c.beginPath();for(let i=0;i<=10;i++){const a=(i/10)*Math.PI*2-Math.PI/2;const r=(i%2===0)?s:s*.42;const x=Math.cos(a)*r,y=Math.sin(a)*r;if(i===0)c.moveTo(x,y);else c.lineTo(x,y);}c.closePath();}
+  function drawOak(c,s){c.beginPath();c.moveTo(0,-s);c.bezierCurveTo(s*.55,-s*.85,s*.75,-s*.3,s*.35,0);c.bezierCurveTo(s*.75,s*.3,s*.55,s*.85,0,s);c.bezierCurveTo(-s*.55,s*.85,-s*.75,s*.3,-s*.35,0);c.bezierCurveTo(-s*.75,-s*.3,-s*.55,-s*.85,0,-s);c.closePath();}
+  function drawBirch(c,s){c.beginPath();c.moveTo(0,-s);c.quadraticCurveTo(s*.7,0,0,s);c.quadraticCurveTo(-s*.7,0,0,-s);c.closePath();}
+  function drawElm(c,s){c.beginPath();c.moveTo(0,-s);c.quadraticCurveTo(s*.85,-s*.1,s*.3,s);c.quadraticCurveTo(-s*.6,s*.7,0,-s);c.closePath();}
+  function drawLeaf(lf) {
+    const s = 14 * lf.scale;
+    lc.save(); lc.translate(lf.x, lf.y); lc.rotate(lf.rot);
+    lc.shadowColor='rgba(0,0,0,.35)'; lc.shadowBlur=6; lc.shadowOffsetY=2;
+    lc.fillStyle = lf.fill;
+    if (lf.type==='maple') drawMaple(lc,s);
+    else if (lf.type==='oak') drawOak(lc,s);
+    else if (lf.type==='birch') drawBirch(lc,s);
+    else drawElm(lc,s);
+    lc.fill();
+    lc.shadowBlur=0; lc.shadowOffsetY=0;
+    lc.lineWidth=Math.max(.6,s*.06); lc.strokeStyle=lf.vein; lc.stroke();
+    lc.beginPath(); lc.moveTo(0,-s*.9); lc.lineTo(0,s*.9);
+    lc.strokeStyle=lf.vein; lc.lineWidth=Math.max(.5,s*.05);
+    lc.globalAlpha=.75; lc.stroke();
+    lc.globalAlpha=.45; lc.lineWidth=Math.max(.4,s*.03);
+    for (let i=-2;i<=2;i++){
+      lc.beginPath(); lc.moveTo(0,i*s*.28); lc.lineTo(s*.55,i*s*.28+s*.3);
+      lc.moveTo(0,i*s*.28); lc.lineTo(-s*.55,i*s*.28+s*.3); lc.stroke();
+    }
+    lc.globalAlpha=.18; lc.fillStyle='#FFFFFF';
+    lc.beginPath(); lc.ellipse(-s*.25,-s*.35,s*.18,s*.35,-.4,0,Math.PI*2); lc.fill();
+    lc.restore();
+  }
+  function tick() {
+    if (!running) return;
+    const W = window.innerWidth, H = window.innerHeight;
+    lc.clearRect(0,0,W,H);
+    if (leaves.length < 55 && Math.random() < .28) leaves.push(makeLeaf());
+    for (let i=leaves.length-1;i>=0;i--) {
+      const lf = leaves[i];
+      lf.life++; lf.swayPhase += lf.swaySpeed;
+      const sway = Math.sin(lf.swayPhase) * lf.swayAmp;
+      lf.x += lf.vx + sway*.4;
+      lf.y += lf.vy;
+      lf.rot += lf.vrot + sway*.002;
+      if (lf.y > H+60 || lf.life > lf.maxLife || lf.x < -80 || lf.x > W+80) {
+        leaves.splice(i,1); continue;
+      }
+      drawLeaf(lf);
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize', resize);
+  window.__autumnLeaves = {
+    start() {
+      if (running) return;
+      resize();
+      for (let i=0;i<20;i++){const lf=makeLeaf();lf.y=Math.random()*window.innerHeight;leaves.push(lf);}
+      running = true; tick();
+    },
+    stop() {
+      running = false;
+      if (rafId){cancelAnimationFrame(rafId);rafId=null;}
+      lc.clearRect(0,0,window.innerWidth,window.innerHeight);
+      leaves = [];
+    }
+  };
+})();
 </script>
 
 </body>

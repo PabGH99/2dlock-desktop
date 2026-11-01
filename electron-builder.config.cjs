@@ -32,12 +32,14 @@ module.exports = {
     'desktop-updater-ui.js',
     'main.cjs',
     'preload.cjs',
-    'package.json'
+    'package.json',
+    'build/icon.png'
   ],
   asar: true,
   compression: 'maximum',
   npmRebuild: false,
   win: {
+    icon: 'build/icon.ico',
     target: ['nsis'],
     signAndEditExecutable: false
   },

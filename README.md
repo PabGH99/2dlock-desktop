@@ -1,10 +1,14 @@
+<p align="center">
+  <img src="build/2dlock-logo.png" alt="Logo 2Dlock" width="320">
+</p>
+
 # ⚽ 2Dlock — Domina il campo. Riscrivi la partita.
 
 **2Dlock** è un gioco di calcio 2D ispirato all'energia degli anime calcistici: partite ad alta intensità, stili di gioco distintivi, abilità spettacolari e risvegli capaci di ribaltare il risultato. Non basta correre verso la porta: devi leggere l'azione, scegliere il momento giusto e trasformare ogni possesso in un'occasione.
 
 Il progetto è realizzato in **HTML5, Canvas, CSS e JavaScript** e può essere giocato direttamente nel browser oppure tramite l'app desktop Windows basata su Electron.
 
-> **Versione del gioco:** V7.7.19 TEST · **Desktop/updater:** 3.0.3  
+> **Versione del gioco:** V7.7.23 TEST · **Desktop/updater:** 3.0.4  
 > [⬇️ Scarica l'ultima versione per Windows](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases/latest) · [📦 Tutte le release](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases)
 
 ---
@@ -13,6 +17,8 @@ Il progetto è realizzato in **HTML5, Canvas, CSS e JavaScript** e può essere g
 
 ### ⚽ Partite veloci e sfide tattiche
 Gioca partite locali contro bot, costruisci le azioni con passaggi e dribbling, strappa il pallone agli avversari e cerca la conclusione perfetta. La modalità Ranked 5v5 propone matchmaking locale contro bot, difficoltà legata al rank e progressione competitiva.
+
+Il menu LAN in browser include una preview delle schermate host, join e lobby; le connessioni LAN reali richiedono il bridge della versione desktop.
 
 ### 🧬 Style Lab — scegli la tua arma
 Gli **Stili** definiscono le abilità del tuo giocatore. Ogni stile ha una propria identità, mosse C/X/V e un'abilità di Awakening: dalle accelerazioni e dai tiri speciali fino a dribbling tecnici, finte e tecniche difensive.
@@ -28,8 +34,9 @@ Usa il Gacha per ottenere Stili e Flow, prova i **Lucky Spin** e punta alle cate
 ### 🌹 Abilità, VFX e momenti da ricordare
 Ogni partita è accompagnata da effetti visivi dedicati: rose blu e scie energetiche di Kaiser, reveal distinti per Stili e Flow, banner goal e **ANKLE BREAKER!** quando riesci a superare un difensore. Le celebrazioni, i replay e gli effetti del pallone rendono ogni azione importante.
 
-### 🎃 Battle Pass Halloween e missioni a rotazione
-Il Battle Pass Halloween affianca le ricompense stagionali a cinque missioni settimanali dedicate, con reset ogni lunedì. Le missioni normali Egoist si rinnovano ogni 24 ore: progressi e riscatti restano distinti dalle missioni stagionali e settimanali.
+### 🍁 EGOIST AUTUMN FEST — Battle Pass e missioni a rotazione
+Il Battle Pass stagionale Autumn include ricompense Free e Premium distribuite sui livelli, cinque missioni settimanali con reset il lunedì e missioni normali Egoist giornaliere con reset ogni 24 ore. Le ricompense cosmetiche del Pass non possono essere vendute; dopo aver completato tutti i livelli e riscattato le ricompense disponibili, il ciclo può essere riavviato dall'apposito pulsante.
+
 
 ### 🏟️ Stadi e personalizzazione
 Scegli tra stadi diversi e personalizza l'esperienza con skin del pallone, effetti di esplosione goal e altre ricompense estetiche. La HUD delle abilità resta in una rail laterale compatta, così i comandi sono leggibili senza coprire il campo.
@@ -85,7 +92,7 @@ In alternativa, su Windows puoi usare `AVVIA_DEV.bat` per avviare in sviluppo o 
 Il repository usa **GitHub Actions** per compilare e pubblicare l'installer Windows e i file necessari all'auto-updater.
 
 1. Aggiorna `index.html`, inclusi titolo, metadati, contratto di manutenzione e changelog del gioco.
-2. Incrementa la versione desktop in **entrambi** `package.json` e `package-lock.json` (per esempio `3.0.2` → `3.0.3`).
+2. Incrementa la versione desktop in **entrambi** `package.json` e `package-lock.json` (per esempio `3.0.2` → `3.0.4`).
 3. Fai commit e push su `main` quando sei pronto a pubblicare.
 4. Il workflow esegue i controlli, crea la release `vX.Y.Z`, compila l'installer e carica `.exe`, `.blockmap` e `latest.yml`.
 
@@ -104,8 +111,8 @@ I salvataggi dell'app desktop sono conservati in `%APPDATA%\\2Dlock`, al di fuor
 ## 📌 Informazioni sul progetto
 
 - **Gioco:** 2Dlock — calcio 2D con stili, Flow e abilità.
-- **Build corrente:** V7.7.19 TEST.
-- **App desktop:** Electron per Windows.
+- **Build corrente:** V7.7.23 TEST.
+- **App desktop:** Electron per Windows (3.0.4).
 - **Gameplay:** locale contro bot; gli aggiornamenti automatici richiedono Internet.
 - **Release:** [GitHub Releases](https://github.com/pinzagliapablo-svg/2dlock-desktop/releases).
 
